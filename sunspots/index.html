@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="Trouvez les terrasses au soleil à Bruxelles en temps réel. SunSpots repère les bons spots pour boire un verre au soleil, maintenant.">
+
+<meta property="og:title" content="SunSpots — terrasse & zonneclash à Bruxelless">
+<meta property="og:description" content="La mini-app qui repère les terrasses au soleil à Bruxelles, en temps réel.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mini.appvelvet.com/sunspots/">
+<meta property="og:image" content="https://mini.appvelvet.com/sunspots/og-image.jpg">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SunSpots — terrasse & zonneclash à Bruxelless">
+<meta name="twitter:description" content="Repérez les terrasses au soleil à Bruxelles, maintenant.">
+<meta name="twitter:image" content="https://mini.appvelvet.com/sunspots/og-image.jpg">
+
+<title>SunSpots — terrasse & zonneclash à Bruxelless</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Barlow+Condensed:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9LTQGK91J6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-9LTQGK91J6');
+</script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --sun-bright: #F5A623; --partial: #B8860B; --shade-blue: #7AADCC;
+  --bg: #080D18; --bg-mid: #0D1525;
+  --cream: #EFF4FF; --warm-mid: #7A96B8;
+  --card-border: rgba(120,160,220,0.1);
+}
+html, body { background: var(--bg); color: var(--cream); font-family: 'DM Mono', monospace; overflow-x: hidden; }
+
+/* ── HEADER ── */
+.header { position:relative; background:var(--bg); padding:0.85rem 1.1rem 0; overflow:hidden; }
+
+/* Solar circle bg */
+.solar-bg {
+  position:absolute;
+  width:130vw; height:130vw;
+  max-width:700px; max-height:700px;
+  border-radius:50%;
+  background: radial-gradient(circle at 45% 40%,
+    #FFB347 0%, #F5A623 12%, #E8621A 35%,
+    #A02000 60%, #580A00 80%, #1A0500 100%
+  );
+  top:-82%; left:50%; transform:translateX(-50%);
+  z-index:0; opacity:0.85;
+}
+
+/* Glass overlay */
+.solar-glass {
+  position:absolute;
+  bottom:0; left:0; right:0; height:65%;
+  backdrop-filter:blur(16px) saturate(1.1);
+  -webkit-backdrop-filter:blur(16px) saturate(1.1);
+  background:linear-gradient(to bottom,
+    rgba(13,9,4,0.0) 0%,
+    rgba(13,9,4,0.6) 45%,
+    rgba(13,9,4,0.95) 100%
+  );
+  z-index:1; pointer-events:none;
+}
+
+/* Arc SVG — absolute inside glass zone */
+.arc-wrap {
+  width:calc(100% + 2.2rem);
+  margin:0.3rem -1.1rem 0;
+  pointer-events:none;
+}
+.arc-svg { width:100%; height:auto; display:block; overflow:visible; }
+
+/* All header text content above overlays */
+.header-content { position:relative; z-index:3; }
+
+.header-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.25rem; }
+
+/* SunSpots title */
+.app-title {
+  font-family:'Syne', sans-serif;
+  font-weight:800;
+  font-size:1.6rem;
+  color:var(--cream);
+  letter-spacing:-0.01em;
+  line-height:1;
+  opacity:0.95;
+}
+.app-sub {
+  font-size:0.58rem; letter-spacing:0.12em; text-transform:uppercase;
+  color:rgba(239,244,255,0.55); margin-top:0.25rem; font-family:'DM Mono',monospace;
+}
+
+.time-block { text-align:right; }
+.current-time {
+  font-family:'Barlow Condensed', sans-serif; font-weight:800;
+  font-size:2.4rem; color:var(--cream); letter-spacing:0.02em; line-height:1; opacity:0.88;
+}
+.current-date {
+  font-size:0.44rem; color:var(--warm-mid); letter-spacing:0.1em;
+  text-transform:uppercase; margin-top:0.1rem; opacity:0.45; font-family:'DM Mono',monospace;
+}
+
+
+/* ── TIMELINE CURSOR ── */
+#timeline-cursor { 
+  position:fixed;
+  top:0; bottom:0;
+  width:1px;
+  background:linear-gradient(to bottom,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0) 22%,
+    rgba(255,255,255,0.5) 32%,
+    rgba(255,255,255,0.5) 88%,
+    rgba(255,255,255,0) 100%
+  );
+  pointer-events:none;
+  z-index:40;
+  transform:translateX(-50%);
+  transition:left 0.06s linear;
+}
+
+#cursor-chip { 
+  position:fixed;
+  font-family:'DM Mono',monospace;
+  font-size:0.42rem;
+  letter-spacing:0.06em;
+  color:rgba(255,255,255,0.9);
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.28);
+  padding:0.12rem 0.35rem;
+  pointer-events:none;
+  z-index:41;
+  transform:translateX(-50%);
+  transition:left 0.06s linear;
+  white-space:nowrap;
+  backdrop-filter:blur(4px);
+}
+
+/* ── SLIDER ── */
+.slider-area { padding:0.35rem 0 0.3rem; }
+.slider-meta { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.42rem; }
+.time-label { font-size:0.44rem; color:var(--warm-mid); opacity:0.5; letter-spacing:0.12em; text-transform:uppercase; }
+.selected-time { font-family:'Barlow Condensed', sans-serif; font-weight:800; font-size:2.5rem; color:var(--sun-bright); letter-spacing:0.02em; line-height:1; }
+.sun-status { font-family:'DM Mono', monospace; font-size:0.74rem; color:var(--warm-mid); text-align:right; }
+
+input[type=range] { -webkit-appearance:none; width:100%; height:2px; background:rgba(245,166,35,0.12); outline:none; cursor:pointer; display:block; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; background:var(--cream); border:2px solid var(--bg); border-radius:50%; cursor:pointer; box-shadow:0 0 8px rgba(245,166,35,0.55); }
+.time-ticks { display:flex; justify-content:space-between; font-size:0.44rem; color:rgba(120,160,220,0.35); margin-top:0.32rem; }
+
+/* ── WEATHER + GEO ── */
+.weather-geo { display:flex; align-items:center; justify-content:space-between; padding:0.52rem 0 0.65rem; margin-top:0.48rem; }
+.weather-geo--under-clock { padding:0.2rem 0 0.35rem; margin-top:0.15rem; }
+.weather-block { display:flex; align-items:center; gap:0.4rem; }
+.weather-icon { font-size:1rem; }
+.weather-text { font-family:'DM Mono', monospace; font-size:0.72rem; color:var(--warm-mid); }
+.geo-btn { font-size:0.44rem; color:var(--shade-blue); border:1px solid rgba(90,122,138,0.3); padding:0.17rem 0.44rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; background:none; font-family:'DM Mono',monospace; }
+.geo-btn:hover { border-color:var(--shade-blue); }
+.geo-btn.located { color:var(--sun-bright); border-color:rgba(245,166,35,0.4); }
+
+/* ── TABS ── */
+.commune-tabs { display:flex; overflow-x:auto; scrollbar-width:none; background:var(--bg-mid); border-top:1px solid var(--card-border); border-bottom:1px solid var(--card-border); position:sticky; top:0; z-index:50; }
+.commune-tabs::-webkit-scrollbar { display:none; }
+.commune-tab { font-family:'Barlow Condensed', sans-serif; font-weight:700; font-size:0.82rem; letter-spacing:0.1em; color:rgba(154,122,90,0.36); padding:0.56rem 0.88rem 0.5rem; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; transition:all 0.18s; flex-shrink:0; position:relative; top:1px; }
+.commune-tab:hover { color:var(--warm-mid); }
+.commune-tab.active { color:var(--sun-bright); border-bottom-color:var(--sun-bright); }
+.commune-tab.geo-tab { color:rgba(90,122,138,0.42); border-left:1px solid var(--card-border); margin-left:auto; }
+.commune-tab.geo-tab.active { color:var(--shade-blue); border-bottom-color:var(--shade-blue); }
+
+/* ── COUNT ── */
+.sun-count { padding:0.46rem 1.1rem; font-size:0.5rem; color:var(--warm-mid); opacity:0.5; letter-spacing:0.1em; text-transform:uppercase; min-height:1.65rem; display:flex; align-items:center; border-bottom:1px solid var(--card-border); background:var(--bg); }
+.sun-count span { color:var(--sun-bright); opacity:1; font-weight:500; }
+
+/* ── CARDS ── */
+.cafe-list { padding:0 0 4rem; background:var(--bg); }
+.cafe-card { padding:0.82rem 1.1rem; border-bottom:1px solid var(--card-border); display:grid; grid-template-columns:1fr auto; gap:0.3rem 0.82rem; cursor:pointer; transition:background 0.15s; position:relative; }
+.cafe-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
+.cafe-card.s::before { background:var(--sun-bright); }
+.cafe-card.p::before { background:var(--partial); }
+.cafe-card.n::before { background:rgba(90,122,138,0.1); }
+.cafe-card.s { background:rgba(245,166,35,0.04); }
+.cafe-card:active { background:rgba(245,166,35,0.08); }
+
+.cafe-name { font-family:'Syne', sans-serif; font-weight:700; font-size:0.95rem; color:var(--cream); line-height:1.2; }
+.cafe-meta-row { display:flex; align-items:center; gap:0.38rem; margin-top:0.05rem; flex-wrap:wrap; }
+.cafe-dist { font-size:0.46rem; color:var(--warm-mid); opacity:0.38; }
+.cafe-dist::before { content:'·'; margin-right:0.3rem; }
+
+.sun-badge { font-family:'Barlow Condensed', sans-serif; font-weight:800; font-size:0.65rem; letter-spacing:0.08em; padding:0.12rem 0.42rem; align-self:start; flex-shrink:0; white-space:nowrap; }
+.sun-badge.s { background:linear-gradient(135deg,#FFD166 0%,#F5A623 55%,#E8840A 100%); color:#0A0600; border:none; box-shadow:0 0 10px rgba(245,166,35,0.3); }
+.sun-badge.p { background:transparent; border:1px solid rgba(184,134,11,0.5); color:#B8960A; }
+.sun-badge.n { background:transparent; border:1px solid rgba(120,160,220,0.18); color:rgba(120,160,220,0.38); }
+
+.day-bar-mini { grid-column:1/-1; display:flex; height:3px; gap:1px; border-radius:1px; overflow:hidden; }
+.ds { flex:1; }
+.ds.s { background:var(--sun-bright); opacity:0.76; }
+.ds.p { background:var(--partial); opacity:0.56; }
+.ds.n { background:rgba(255,255,255,0.053); }
+.ds.active { outline:2px solid rgba(255,255,255,0.52); outline-offset:1px; position:relative; z-index:1; }
+
+.card-expanded { grid-column:1/-1; padding-top:0.5rem; border-top:1px solid var(--card-border); margin-top:0.13rem; display:none; }
+.card-expanded.open { display:block; }
+.expand-ticks { display:flex; justify-content:space-between; font-size:0.44rem; color:rgba(154,122,90,0.27); margin-bottom:0.27rem; }
+.sun-window { font-size:0.6rem; color:var(--warm-mid); margin-top:0.27rem; }
+.sun-window strong { color:var(--sun-bright); }
+.sun-window.theoretical { color: var(--warm-mid); opacity: 0.7; }
+.sun-window.theoretical strong { color: var(--warm-mid); }
+.sun-window-note { font-size: 0.46rem; opacity: 0.55; display: block; margin-top: 0.15rem; letter-spacing: 0.04em; }
+
+.street-type-tag { font-size:0.42rem; color:var(--warm-mid); opacity:0.52; letter-spacing:0.04em; margin-top:0.08rem; }
+.slot-weather-row { display:flex; align-items:center; gap:0.55rem; margin-top:0.28rem; flex-wrap:wrap; }
+.slot-weather-row span { font-size:0.5rem; font-family:'DM Mono',monospace; color:var(--cream); letter-spacing:0.03em; white-space:nowrap; }
+.uv-chip { display:inline-flex; align-items:center; gap:0.25rem; font-size:0.5rem; color:var(--cream); font-family:'DM Mono',monospace; }
+.uv-chip-bar { width:36px; height:4px; border-radius:2px; background:linear-gradient(to right,#4CAF50,#FFC107,#FF5722,#9C27B0); position:relative; display:inline-block; vertical-align:middle; }
+.uv-chip-dot { position:absolute; top:50%; width:7px; height:7px; border-radius:50%; background:#fff; transform:translateY(-50%) translateX(-50%); border:1.5px solid var(--bg); }
+.azimuth-tag { font-size:0.44rem; color:rgba(154,122,90,0.22); margin-top:0.17rem; letter-spacing:0.05em; }
+
+.cafe-name-row { display:flex; align-items:baseline; gap:0.5rem; flex-wrap:wrap; }
+.cafe-address { font-size:0.52rem; color:var(--warm-mid); opacity:0.5; font-family:'DM Mono',monospace; }
+.copy-btn { background:none; border:none; cursor:pointer; padding:0 0.1rem; font-size:0.65rem; opacity:0.3; transition:opacity 0.2s; line-height:1; flex-shrink:0; color:var(--warm-mid); }
+.copy-btn:hover { opacity:0.8; }
+.copy-btn.copied { opacity:1; color:var(--sun-bright); }
+.copy-toast { position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%); background:var(--bg-mid); border:1px solid rgba(245,166,35,0.28); color:var(--sun-bright); font-size:0.52rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.35rem 0.88rem; pointer-events:none; opacity:0; transition:opacity 0.2s; z-index:300; }
+.copy-toast.show { opacity:1; }
+.rooftop-tag { font-size:0.44rem; color:var(--shade-blue); border:1px solid rgba(90,122,138,0.27); padding:0.07rem 0.28rem; letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; align-self:center; }
+.curated-dot { width:4px; height:4px; background:var(--sun-bright); border-radius:50%; flex-shrink:0; align-self:center; opacity:0.4; }
+
+
+/* ── WEATHER BANNER ── */
+.weather-banner {
+  padding: 0.5rem 1.1rem;
+  font-size: 0.55rem; letter-spacing: 0.06em;
+  font-family: 'DM Mono', monospace;
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.weather-banner.rain {
+  background: rgba(100,140,200,0.12);
+  border-bottom: 1px solid rgba(100,140,200,0.2);
+  color: #7AADCC;
+}
+.weather-banner.cloud {
+  background: rgba(120,120,150,0.08);
+  border-bottom: 1px solid rgba(120,120,150,0.15);
+  color: var(--warm-mid);
+}
+
+/* Rain / cloud badges */
+.sun-badge.r {
+  background: transparent;
+  border: 1px solid rgba(100,140,200,0.4);
+  color: #7AADCC;
+}
+.sun-badge.c {
+  background: transparent;
+  border: 1px solid rgba(150,150,180,0.3);
+  color: rgba(150,160,200,0.6);
+}
+
+/* ── STATES ── */
+.state-msg { padding:2.5rem 2rem; text-align:center; font-family:'DM Mono', monospace;  color:var(--warm-mid); opacity:0.4; font-size:0.84rem; line-height:1.8; }
+.loader { width:18px; height:18px; border:2px solid rgba(245,166,35,0.1); border-top-color:var(--sun-bright); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 0.72rem; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.step-list { margin-top:0.52rem; display:flex; flex-direction:column; gap:0.27rem; }
+.step { font-size:0.48rem; letter-spacing:0.06em; text-transform:uppercase; opacity:0.21; transition:opacity 0.3s; }
+.step.done { opacity:0.17; text-decoration:line-through; }
+.step.active { opacity:0.58; color:var(--sun-bright); }
+
+/* ── FOOTER ── */
+.footer {
+  padding: 1.5rem 1.1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--card-border);
+  background: var(--bg);
+}
+.footer-credit {
+  font-size: 0.52rem; color: var(--warm-mid); opacity: 0.45;
+  letter-spacing: 0.08em; font-family: 'DM Mono', monospace;
+  display: flex; align-items: center; gap: 0.35rem;
+}
+.footer-credit a {
+  color: var(--warm-mid); text-decoration: none; opacity: 0.8;
+  border-bottom: 1px solid rgba(120,160,220,0.3);
+  transition: opacity 0.2s;
+}
+.footer-credit a:hover { opacity: 1; border-bottom-color: var(--shade-blue); }
+
+.footer-suggest {
+  font-family: 'DM Mono', monospace; font-size: 0.5rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--shade-blue); cursor: pointer;
+  border: 1px solid rgba(120,160,220,0.25);
+  padding: 0.3rem 0.7rem; background: none;
+  transition: all 0.2s;
+}
+.footer-suggest:hover { border-color: var(--shade-blue); color: var(--cream); }
+
+/* ── SUGGEST MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(8,13,24,0.88);
+  backdrop-filter: blur(8px);
+  z-index: 500;
+  display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+.modal-box {
+  width: 100%; background: var(--bg-mid);
+  border-top: 1px solid rgba(120,160,220,0.15);
+  padding: 1.5rem 1.1rem 2rem;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.modal-overlay.open .modal-box { transform: translateY(0); }
+
+.modal-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 1rem;
+}
+.modal-title {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 1.1rem; color: var(--cream);
+}
+.modal-close {
+  background: none; border: none; color: var(--warm-mid);
+  font-size: 1rem; cursor: pointer; opacity: 0.5; padding: 0;
+}
+.modal-close:hover { opacity: 1; }
+
+.modal-desc {
+  font-size: 0.55rem; color: var(--warm-mid); opacity: 0.6;
+  letter-spacing: 0.04em; line-height: 1.6;
+  margin-bottom: 1.25rem; font-family: 'DM Mono', monospace;
+}
+
+.modal-fields { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem; }
+.modal-field {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--card-border);
+  padding: 0.65rem 0.85rem;
+  color: var(--cream); font-family: 'DM Mono', monospace;
+  font-size: 0.6rem; outline: none; width: 100%;
+  transition: border-color 0.2s;
+}
+.modal-field::placeholder { color: var(--warm-mid); opacity: 0.4; }
+.modal-field:focus { border-color: rgba(120,160,220,0.4); }
+
+.modal-send {
+  width: 100%; background: linear-gradient(135deg,#FFD166 0%,#F5A623 55%,#E8840A 100%);
+  border: none; color: #0A0600;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.75rem; cursor: pointer;
+  transition: opacity 0.2s;
+}
+.modal-send:hover { opacity: 0.88; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="solar-bg"></div>
+  <div class="solar-glass"></div>
+
+  <div class="header-content">
+    <div class="header-top">
+      <div>
+        <div class="app-title">SunSpots</div>
+        <div class="app-sub">Bruxelles - Ensoleillement des terrasses entre deux draches</div>
+      </div>
+      <div class="time-block">
+        <div class="current-time" id="clockDisplay">--:--</div>
+        <div class="current-date" id="dateDisplay">---</div>
+      </div>
+    </div>
+
+    <div class="weather-geo weather-geo--under-clock">
+      <div class="weather-block">
+        <span class="weather-icon" id="weatherIcon">—</span>
+        <span class="weather-text" id="contextText">Météo…</span>
+      </div>
+      <button class="geo-btn" id="geoBtn" onclick="requestGeo()">📍 Me localiser</button>
+    </div>
+
+    <!-- Arc SVG -->
+    <div class="arc-wrap">
+      <svg class="arc-svg" id="arcSvg" viewBox="0 0 800 80" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="sunGlowGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" style="stop-color:#FFD166;stop-opacity:0.6"/>
+            <stop offset="55%" style="stop-color:#F5A623;stop-opacity:0.22"/>
+            <stop offset="100%" style="stop-color:#E8621A;stop-opacity:0"/>
+          </radialGradient>
+          <filter id="dotGlow" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        
+        <path id="arcPath" d="" stroke="rgba(245,166,35,0.22)" stroke-width="1.2" fill="none" stroke-dasharray="3 5"/>
+        <circle id="sunGlowEl" cx="400" cy="30" r="32" fill="url(#sunGlowGrad)" opacity="0"/>
+        <circle id="sunDotEl" cx="400" cy="30" r="7" fill="#F5A623" filter="url(#dotGlow)" opacity="0"/>
+        <g id="hourLabels" style="display:none"></g>
+      </svg>
+    </div>
+
+    <div class="slider-area">
+      <div class="slider-meta">
+        <div>
+          <div class="time-label">Heure sélectionnée</div>
+          <div class="selected-time" id="selectedTime">--:--</div>
+        </div>
+        <div class="sun-status" id="sunStatusText"></div>
+      </div>
+      <input type="range" id="timeSlider" min="0" max="72" value="24" step="1" oninput="onSliderInput()">
+      <div class="slot-weather-row" style="padding:0.3rem 0 0;">
+        <span id="slotWeather"></span>
+        <span id="uvInline"></span>
+        <span id="aqiInline"></span>
+      </div>
+
+    </div>
+
+  </div><!-- end header-content -->
+</div>
+
+<div class="commune-tabs" id="communeTabs">
+  <div class="commune-tab active" data-commune="ixelles" onclick="selectCommune('ixelles')">Ixelles</div>
+  <div class="commune-tab" data-commune="saint-gilles" onclick="selectCommune('saint-gilles')">St-Gilles</div>
+  <div class="commune-tab" data-commune="forest" onclick="selectCommune('forest')">Forest</div>
+  <div class="commune-tab" data-commune="uccle" onclick="selectCommune('uccle')">Uccle</div>
+  <div class="commune-tab" data-commune="centre" onclick="selectCommune('centre')">Centre</div>
+  <div class="commune-tab" data-commune="schaerbeek" onclick="selectCommune('schaerbeek')">Schaerbeek</div>
+  <div class="commune-tab" data-commune="etterbeek" onclick="selectCommune('etterbeek')">Etterbeek</div>
+  <div class="commune-tab" data-commune="anderlecht" onclick="selectCommune('anderlecht')">Anderlecht</div>
+  <div class="commune-tab" data-commune="molenbeek" onclick="selectCommune('molenbeek')">Molenbeek</div>
+  <div class="commune-tab" data-commune="jette" onclick="selectCommune('jette')">Jette</div>
+  <div class="commune-tab" data-commune="saint-josse" onclick="selectCommune('saint-josse')">St-Josse</div>
+  <div class="commune-tab" data-commune="woluwe-sl" onclick="selectCommune('woluwe-sl')">WSL</div>
+  <div class="commune-tab" data-commune="woluwe-sp" onclick="selectCommune('woluwe-sp')">WSP</div>
+  <div class="commune-tab" data-commune="auderghem" onclick="selectCommune('auderghem')">Auderghem</div>
+  <div class="commune-tab geo-tab" data-commune="geo" onclick="selectGeo()">📍 Moi</div>
+</div>
+
+<div id="weatherBanner"></div>
+<div class="sun-count" id="sunCount"></div>
+<div id="mainContent"><div class="state-msg"><div class="loader"></div>Chargement…</div></div>
+<div id="timeline-cursor"></div>
+<div id="cursor-chip"></div>
+<div class="copy-toast" id="copyToast">Adresse copiée</div>
+
+<script>
+const COMMUNES = {
+  'ixelles':      {label:'Ixelles',    lat:50.8280,lng:4.3750,radius:900 },
+  'saint-gilles': {label:'St-Gilles',  lat:50.8330,lng:4.3460,radius:800 },
+  'forest':       {label:'Forest',     lat:50.8120,lng:4.3340,radius:1000},
+  'uccle':        {label:'Uccle',      lat:50.7980,lng:4.3570,radius:1200},
+  'centre':       {label:'Centre',     lat:50.8490,lng:4.3490,radius:900 },
+  'schaerbeek':   {label:'Schaerbeek', lat:50.8670,lng:4.3790,radius:900 },
+  'etterbeek':    {label:'Etterbeek',  lat:50.8360,lng:4.3930,radius:900 },
+  'anderlecht':   {label:'Anderlecht', lat:50.8360,lng:4.3070,radius:1200},
+  'molenbeek':    {label:'Molenbeek',  lat:50.8530,lng:4.3280,radius:900 },
+  'jette':        {label:'Jette',      lat:50.8810,lng:4.3240,radius:900 },
+  'saint-josse':  {label:'St-Josse',   lat:50.8620,lng:4.3680,radius:600 },
+  'woluwe-sl':    {label:'WSL',        lat:50.8390,lng:4.4320,radius:1000},
+  'woluwe-sp':    {label:'WSP',        lat:50.8190,lng:4.4390,radius:1000},
+  'auderghem':    {label:'Auderghem',  lat:50.8100,lng:4.4180,radius:900 },
+  'antwerpen':    {label:'Anvers',     lat:51.2213,lng:4.4051,radius:1500},
+};
+
+const CURATED = []; // data comes from JSON;
+
+// ── STATE ──
+let activeCommune='ixelles', userLat=null, userLng=null, displaySlot=null;
+let cache={}, weatherCache={};
+
+// ── CLOCK ──
+function updateClock() {
+  const n=new Date();
+  document.getElementById('clockDisplay').textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  const D=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],M=['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+  const el=document.getElementById('dateDisplay');
+  if(el) el.textContent=`${D[n.getDay()]} ${n.getDate()} ${M[n.getMonth()]}`.toUpperCase();
+}
+updateClock(); setInterval(updateClock,30000);
+
+// ── SLOTS ──
+const DAY_START_HOUR = 5;
+const DAY_END_HOUR = 23;
+const SLOT_MINUTES = 15;
+const SLOT_MAX = ((DAY_END_HOUR - DAY_START_HOUR) * 60) / SLOT_MINUTES;
+const SLOT_COUNT = SLOT_MAX + 1;
+const DAY_SPAN_HOURS = DAY_END_HOUR - DAY_START_HOUR;
+
+function currentSlot(){const n=new Date();return Math.max(0,Math.min(SLOT_MAX,Math.round((((n.getHours()-DAY_START_HOUR)*60)+n.getMinutes())/SLOT_MINUTES)));}
+function slotToDate(s){const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate(),DAY_START_HOUR,s*SLOT_MINUTES);}
+function slotToStr(s){const d=slotToDate(s);return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function slotToHour(s){return DAY_START_HOUR+s*SLOT_MINUTES/60;}
+function getActiveSlot(){return displaySlot!==null?displaySlot:currentSlot();}
+
+// ── UTILS ──
+function haversine(la1,ln1,la2,ln2){const R=6371000,dL=(la2-la1)*Math.PI/180,dN=(ln2-ln1)*Math.PI/180;const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+function fmtDist(m){return m<1000?Math.round(m/10)*10+'m':(m/1000).toFixed(1).replace('.',',')+' km';}
+function bbox(lat,lng,r){const d=r/111320,dL=d/Math.cos(lat*Math.PI/180);return{s:lat-d,n:lat+d,w:lng-dL,e:lng+dL};}
+
+// ── AZIMUTH ──
+function bearing(la1,ln1,la2,ln2){const dL=(ln2-ln1)*Math.PI/180,la1r=la1*Math.PI/180,la2r=la2*Math.PI/180;const y=Math.sin(dL)*Math.cos(la2r),x=Math.cos(la1r)*Math.sin(la2r)-Math.sin(la1r)*Math.cos(la2r)*Math.cos(dL);return(Math.atan2(y,x)*180/Math.PI+360)%360;}
+function toXY(lat,lng,rla,rln){return{x:(lng-rln)*Math.cos(rla*Math.PI/180)*111320,y:(lat-rla)*111320};}
+function ptSeg(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy;if(!l2)return Math.sqrt((px-ax)**2+(py-ay)**2);const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/l2));return Math.sqrt((px-ax-t*dx)**2+(py-ay-t*dy)**2);}
+function azimuthFromRoads(lat,lng,segs){
+  if(!segs.length)return Math.round(Math.random()*360);
+  let best=Infinity,bestAz=null;
+  for(const s of segs){const a=toXY(s.la1,s.ln1,lat,lng),b=toXY(s.la2,s.ln2,lat,lng);const d=ptSeg(0,0,a.x,a.y,b.x,b.y);if(d<best){best=d;const rb=bearing(s.la1,s.ln1,s.la2,s.ln2);const cross=(b.x-a.x)*(0-a.y)-(b.y-a.y)*(0-a.x);const perp=cross>0?(rb+90)%360:(rb-90+360)%360;bestAz=Math.round((perp+180)%360);}}
+  return bestAz??Math.round(Math.random()*360);
+}
+
+// ── OVERPASS : multi-endpoint + fallback curated si tout échoue ──
+const ENDPOINTS=[
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+];
+async function fetchCafesAndRoads(lat,lng,radius){
+  const b=bbox(lat,lng,radius),bS=`${b.s},${b.w},${b.n},${b.e}`;
+  const q=`[out:json][timeout:25];(node(${bS})[amenity~"cafe|bar|restaurant"][outdoor_seating=yes];way(${bS})[amenity~"cafe|bar|restaurant"][outdoor_seating=yes];way(${bS})[highway~"^(primary|secondary|tertiary|residential|unclassified|living_street|pedestrian|service)$"];);out geom;`;
+  for(const ep of ENDPOINTS){
+    try{
+      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),18000);
+      const resp=await fetch(`${ep}?data=${encodeURIComponent(q)}`,{signal:ctrl.signal});
+      clearTimeout(timer);
+      if(!resp.ok)continue;
+      const data=await resp.json();
+      const cafes=[],roadSegments=[];
+      for(const el of(data.elements||[])){
+        const tags=el.tags||{};
+        if(tags.amenity&&['cafe','bar','restaurant'].includes(tags.amenity)&&tags.outdoor_seating==='yes'){
+          const clat=el.lat??el.center?.lat??(el.geometry?el.geometry.reduce((s,p)=>s+p.lat,0)/el.geometry.length:null);
+          const clng=el.lon??el.center?.lon??(el.geometry?el.geometry.reduce((s,p)=>s+p.lon,0)/el.geometry.length:null);
+          if(clat&&clng&&tags.name)cafes.push({id:el.id,name:tags.name,lat:clat,lng:clng,address:[tags['addr:street'],tags['addr:housenumber']].filter(Boolean).join(' ')||null});
+        }
+        if(tags.highway&&el.geometry?.length>=2){const g=el.geometry;for(let i=0;i<g.length-1;i++)roadSegments.push({la1:g[i].lat,ln1:g[i].lon,la2:g[i+1].lat,ln2:g[i+1].lon});}
+      }
+      return{cafes,roadSegments};
+    }catch(e){continue;}
+  }
+  return{cafes:[],roadSegments:[]};// curated prend le relais
+}
+
+
+// ── AIRTABLE API ──
+const _AT_TOKEN = '';
+const _AT_BASE  = 'appLZBC3hd6wuUTVR';
+const _AT_TABLE = 'tbl3wivJNAop2e1z7';
+const _atCache  = {};
+const _JSON_URL = './sunspots-data.json';
+const _jsonCache = {};
+const _BXL_COMMUNES = ['ixelles','saint-gilles','forest','uccle','centre','schaerbeek','etterbeek','anderlecht','molenbeek','jette','saint-josse','woluwe-sl','woluwe-sp','auderghem'];
+
+async function _fetchAllBrussels() {
+  if (_atCache['bruxelles']) return _atCache['bruxelles'];
+  try {
+    const params = new URLSearchParams({ filterByFormula: '{city}="bruxelles"', pageSize:'100' });
+    ['Name','address','lat','lng','azimuth','rooftop'].forEach(f => params.append('fields[]', f));
+    let records = [], offset = null;
+    do {
+      if (offset) params.set('offset', offset);
+      const d = await fetch('https://api.airtable.com/v0/'+_AT_BASE+'/'+_AT_TABLE+'?'+params,
+        { headers: { Authorization: 'Bearer '+_AT_TOKEN } }).then(r => r.json());
+      if (d.error) throw new Error(d.error.message);
+      records = records.concat(d.records || []);
+      offset = d.offset || null;
+    } while(offset);
+    // Keep all records with lat+lng+name regardless of address
+    const out = records.map(r => ({
+      name:    r.fields.Name,
+      address: r.fields.address || null,
+      lat:     r.fields.lat,
+      lng:     r.fields.lng,
+      azimuth: r.fields.azimuth || null,
+      rooftop: r.fields.rooftop || false,
+      curated: true,
+    })).filter(t => t.lat && t.lng && t.name);
+    _atCache['bruxelles'] = out;
+    console.log('Airtable: '+out.length+' terrasses Bruxelles');
+    return out;
+  } catch(e) {
+    console.warn('Airtable fallback local:', e.message);
+return [];
+  }
+}
+
+async function fetchFromAirtable(cityKey) {
+  if (cityKey === 'antwerpen') {
+    if (_atCache['antwerpen']) return _atCache['antwerpen'];
+    try {
+      const res = await fetch('./sunspots-data.json');
+      if (res.ok) {
+        const d = await res.json();
+        const spots = (d.bruxelles && d.bruxelles.antwerpen) || [];
+        _atCache['antwerpen'] = spots;
+        console.log('Antwerp JSON: '+spots.length+' spots');
+        return spots;
+      }
+    } catch(e) { console.warn('Antwerp JSON err:', e.message); }
+    return [];
+  }
+  if (_BXL_COMMUNES.includes(cityKey)) {
+    const all = await _fetchAllBrussels();
+    const c = COMMUNES[cityKey];
+    if (!c) return all;
+    const radius = (c.radius || 1000) * 2.5;
+    const nearby = all.filter(t => haversine(c.lat, c.lng, t.lat, t.lng) <= radius);
+    console.log('Airtable '+cityKey+': '+nearby.length+'/'+all.length);
+    return nearby;
+  }
+  if (_atCache[cityKey]) return _atCache[cityKey];
+  try {
+    const params = new URLSearchParams({ filterByFormula: '{city}="'+cityKey+'"', pageSize:'100' });
+    ['Name','address','lat','lng','azimuth','rooftop'].forEach(f => params.append('fields[]', f));
+    let records = [], offset = null;
+    do {
+      if (offset) params.set('offset', offset);
+      const d = await fetch('https://api.airtable.com/v0/'+_AT_BASE+'/'+_AT_TABLE+'?'+params,
+        { headers: { Authorization: 'Bearer '+_AT_TOKEN } }).then(r => r.json());
+      if (d.error) throw new Error(d.error.message);
+      records = records.concat(d.records || []);
+      offset = d.offset || null;
+    } while(offset);
+    const out = records.map(r => ({
+      name:r.fields.Name, address:r.fields.address||null,
+      lat:r.fields.lat, lng:r.fields.lng,
+      azimuth:r.fields.azimuth||null, rooftop:r.fields.rooftop||false, curated:true,
+    })).filter(t=>t.lat&&t.lng&&t.name);
+    _atCache[cityKey] = out;
+    return out;
+  } catch(e) {
+    return [];
+  }
+}
+
+async function _fetchAllBrusselsJSON(){
+  if (_jsonCache['bruxelles']) return _jsonCache['bruxelles'];
+  try {
+    const payload = await fetch(_JSON_URL, { cache:'force-cache' }).then(r => {
+      if (!r.ok) throw new Error('JSON unavailable');
+      return r.json();
+    });
+
+let raw = [];
+if (payload.bruxelles && typeof payload.bruxelles === 'object') {
+  const seen = new Set();
+  Object.values(payload.bruxelles).forEach(spots => {
+    if (!Array.isArray(spots)) return;
+    spots.forEach(s => {
+      const key = (s.name||'') + '|' + (s.lat||'') + '|' + (s.lng||'');
+      if (!seen.has(key)) { seen.add(key); raw.push(s); }
+    });
+  });
+} else if (Array.isArray(payload)) { raw = payload; }
+else if (payload.records) { raw = payload.records; }
+    const out = raw.map(r => ({
+      name: r.name || r.Name || null,
+      address: r.address || null,
+      commune: r.commune || r.city || null,
+      lat: Number(r.lat),
+      lng: Number(r.lng),
+      azimuth: Number.isFinite(Number(r.azimuth)) ? Number(r.azimuth) : null,
+      rooftop: !!r.rooftop,
+      street_type: r.street_type || null,
+      curated: true,
+    })).filter(t => Number.isFinite(t.lat) && Number.isFinite(t.lng) && t.name);
+
+    _jsonCache['bruxelles'] = out;
+    console.log('JSON: ' + out.length + ' terrasses');
+    return out;
+  } catch(e) {
+    console.warn('JSON fallback local:', e.message);
+    return [];
+  }
+}
+
+async function fetchFromJSON(cityKey) {
+  const all = await _fetchAllBrusselsJSON();
+
+  if (cityKey === 'geo') return all;
+
+  const c = COMMUNES[cityKey];
+  if (!c) return all;
+
+  const radius = (c.radius || 1000) * 2.5;
+  return all.filter(t => haversine(c.lat, c.lng, t.lat, t.lng) <= radius);
+}
+
+// ── MERGE ──
+function mergeCafes(osmCafes, atData){
+  const toMerge = atData || [];
+  const merged=[...osmCafes];
+  for(const cur of toMerge)if(!osmCafes.some(o=>haversine(o.lat,o.lng,cur.lat,cur.lng)<60))merged.push({...cur,id:'cur-'+cur.name,curated:true});
+  return merged;
+}
+
+// ── SUNCALC ──
+function getSunStatus(lat,lng,az,date){const pos=SunCalc.getPosition(date,lat,lng);if(pos.altitude*180/Math.PI<2)return 'n';const sunAz=(pos.azimuth*180/Math.PI+180+360)%360,diff=Math.abs(sunAz-az)%360,angle=diff>180?360-diff:diff;return angle<70?'s':angle<95?'p':'n';}
+function getSchedule(lat,lng,az){const now=new Date();return Array.from({length:SLOT_COUNT},(_,i)=>getSunStatus(lat,lng,az,new Date(now.getFullYear(),now.getMonth(),now.getDate(),6,i*15)));}
+function getSunWindow(sc, wMap){
+  // Solar slots where sun would shine
+  const sunSlots = sc.map((v,i)=>v==='s'?i:null).filter(i=>i!==null);
+  if(!sunSlots.length) return null;
+  // If no weather map, return theoretical
+  if(!wMap || !Object.keys(wMap).length) return {from:slotToStr(sunSlots[0]),to:slotToStr(sunSlots[sunSlots.length-1]),theoretical:false};
+  // Filter by weather: keep only slots where weather allows sun
+  const realSlots = sunSlots.filter(i => !isRainy(weatherForSlot(wMap,i)) && !isOvercast(weatherForSlot(wMap,i)));
+  if(realSlots.length) return {from:slotToStr(realSlots[0]),to:slotToStr(realSlots[realSlots.length-1]),theoretical:false};
+  // All solar slots are blocked by weather — return theoretical with flag
+  return {from:slotToStr(sunSlots[0]),to:slotToStr(sunSlots[sunSlots.length-1]),theoretical:true};
+}
+
+// ── ARC ──
+const ARC_W=800, ARC_CY=62, ARC_RY=42;
+let _arcLeft=0, _arcUsable=ARC_W; // in SVG units, updated after paint
+
+function computeArcMapping() {
+  const svgEl = document.getElementById('arcSvg');
+  const slider = document.getElementById('timeSlider');
+  if (!svgEl || !slider) return;
+  const svgRect = svgEl.getBoundingClientRect();
+  const sliderRect = slider.getBoundingClientRect();
+  if (!svgRect.width) return;
+  // Thumb half-width (15px thumb)
+  const th = 7.5;
+  // Left px of thumb travel relative to SVG left edge
+  const leftPx  = sliderRect.left  - svgRect.left + th;
+  // Right px of thumb travel relative to SVG left edge
+  const rightPx = sliderRect.right - svgRect.left - th;
+  _arcLeft   = leftPx  / svgRect.width * ARC_W;
+  _arcUsable = (rightPx - leftPx) / svgRect.width * ARC_W;
+}
+
+function drawArc(){
+  computeArcMapping();
+  let d='';
+  for(let i=0;i<=SLOT_MAX;i++){
+    const h=slotToHour(i), t=Math.max(0,Math.min(1,(h-DAY_START_HOUR)/DAY_SPAN_HOURS));
+    const x=_arcLeft+t*_arcUsable, y=ARC_CY-ARC_RY*Math.sin(t*Math.PI);
+    d+=(i===0?`M ${x} ${y}`:`L ${x} ${y}`);
+  }
+  document.getElementById('arcPath').setAttribute('d',d);
+  const g=document.getElementById('hourLabels'); g.innerHTML='';
+  [5,7,9,11,13,15,17,19,21,23].forEach(h=>{
+    const t=(h-DAY_START_HOUR)/DAY_SPAN_HOURS, x=_arcLeft+t*_arcUsable;
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',x); txt.setAttribute('y',ARC_CY+17);
+    txt.textContent=h+'h'; g.appendChild(txt);
+  });
+}
+
+function updateArc(slot){
+  const h=slotToHour(slot), t=Math.max(0,Math.min(1,(h-DAY_START_HOUR)/DAY_SPAN_HOURS));
+  const x=_arcLeft+t*_arcUsable, y=ARC_CY-ARC_RY*Math.sin(t*Math.PI);
+  const daylight=h>=6.5&&h<=21.5, intensity=daylight?Math.sin(t*Math.PI):0;
+  document.getElementById('sunDotEl').setAttribute('cx',x);
+  document.getElementById('sunDotEl').setAttribute('cy',y);
+  document.getElementById('sunDotEl').setAttribute('opacity',Math.max(0,intensity));
+  document.getElementById('sunGlowEl').setAttribute('cx',x);
+  document.getElementById('sunGlowEl').setAttribute('cy',y);
+  document.getElementById('sunGlowEl').setAttribute('opacity',Math.max(0,intensity*0.72));
+  updateCursor(slot);
+}
+
+// ── TIMELINE CURSOR — aligns with arc dot using same mapping ──
+function updateCursor(slot){
+  const svgEl = document.getElementById('arcSvg');
+  const slider = document.getElementById('timeSlider');
+  if (!svgEl || !slider) return;
+  const svgRect = svgEl.getBoundingClientRect();
+  const sliderRect = slider.getBoundingClientRect();
+  const th = 7.5;
+  // Absolute pixel position of thumb center
+  const thumbX = sliderRect.left + th + (slot/SLOT_MAX) * (sliderRect.width - 2*th);
+  const leftPct = (thumbX / window.innerWidth * 100).toFixed(4) + 'vw';
+  const cursor = document.getElementById('timeline-cursor');
+  const chip   = document.getElementById('cursor-chip');
+  if (cursor) cursor.style.left = leftPct;
+  if (chip) {
+    chip.style.left = leftPct;
+    chip.textContent = slotToStr(slot);
+    const tabs = document.querySelector('.commune-tabs');
+    if (tabs) chip.style.top = (tabs.getBoundingClientRect().bottom + 2) + 'px';
+  }
+}
+function getSunStatusText(slot){const h=slotToHour(slot);if(h<7)return'Nuit 🌙';if(h<8.5)return'Lever de soleil 🌅';if(h<11)return'Matinée ☀';if(h<14)return'Plein midi ☀';if(h<17)return'Après-midi ☀';if(h<19)return'Lumière dorée 🌇';if(h<20.5)return'Coucher de soleil 🌆';return'Soirée 🕯';}
+
+// ── WEATHER ──
+const WMO={
+  0:['☀','Dégagé'],1:['🌤','Peu nuageux'],2:['⛅','Nuageux'],3:['☁','Couvert'],
+  45:['🌫','Brouillard'],48:['🌫','Brouillard'],
+  51:['🌦','Bruine'],53:['🌦','Bruine'],55:['🌧','Bruine dense'],
+  61:['🌧','Pluie légère'],63:['🌧','Pluie'],65:['🌧','Forte pluie'],
+  71:['🌨','Neige'],73:['🌨','Neige'],80:['🌦','Averses'],81:['🌧','Averses'],82:['⛈','Averses fortes'],
+  95:['⛈','Orage'],96:['⛈','Orage grêle'],99:['⛈','Orage grêle'],
+};
+
+// Returns true if weather code = precipitations
+function isRainy(code){return [51,53,55,61,63,65,71,73,75,77,80,81,82,85,86,95,96,99].includes(code);}
+// Returns true if overcast (no sun possible)
+function isOvercast(code){return code >= 3 || isRainy(code);}
+
+// Fetch current + hourly forecast for the day
+async function fetchAQI(lat,lng){
+  if(!window._aqiC)window._aqiC={};
+  const k=lat.toFixed(2)+','+lng.toFixed(2);
+  if(window._aqiC[k])return window._aqiC[k];
+  try{
+    const d=await(await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude='+lat+'&longitude='+lng+'&current=european_aqi')).json();
+    const v=d.current&&d.current.european_aqi!=null?d.current.european_aqi:null;
+    const lbl=v===null?null:v<=20?'Bon':v<=40?'Correct':v<=60?'Moyen':v<=80?'Mauvais':'Tr\u00e8s mauvais';
+    const r={aqi:v,label:lbl};
+    window._aqiC[k]=r;return r;
+  }catch{return{aqi:null,label:null};}
+}
+async function fetchWeather(lat,lng){
+  const k=`${lat.toFixed(2)},${lng.toFixed(2)}`;
+  if(weatherCache[k]) return weatherCache[k];
+  try {
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=weather_code,temperature_2m,wind_speed_10m,wind_direction_10m,uv_index&hourly=weather_code&timezone=auto&forecast_days=1`;
+    const d=await(await fetch(url)).json();
+    const[icon,desc]=WMO[d.current.weather_code]||['🌡','Météo'];
+    // Build hourly weather map: hour (0-23) → weather_code
+    const hourlyMap={};
+    (d.hourly.time||[]).forEach((t,i)=>{
+      const h=new Date(t).getHours();
+      hourlyMap[h]=d.hourly.weather_code[i];
+    });
+    const dirs=['N','NE','E','SE','S','SO','O','NO'];const windDir=dirs[Math.round(d.current.wind_direction_10m/45)%8];const windSpeed=Math.round(d.current.wind_speed_10m);const uvIndex=Number.isFinite(d.current.uv_index)?Math.round(d.current.uv_index):null;const result={icon,desc,temp:Math.round(d.current.temperature_2m),windSpeed,windDir,uvIndex,hourlyMap};
+    weatherCache[k]=result;
+    return result;
+  } catch {
+    return{icon:'—',desc:'Météo indisponible',temp:null,hourlyMap:{}};
+  }
+}
+
+// Get weather code for a given slot (15min slot from 6h)
+function weatherForSlot(hourlyMap, slot){
+  const h=Math.floor(6+slot*15/60);
+  return hourlyMap[h] ?? hourlyMap[Object.keys(hourlyMap)[0]] ?? 0;
+}
+
+// Cross solar status with weather → effective status
+// Returns: 's'|'p'|'n' (solar only) + weather modifier
+function effectiveStatus(solarStatus, weatherCode){
+  if(solarStatus==='n') return 'n';
+  if(isRainy(weatherCode)) return 'r';    // rain — solar would be sun but it's raining
+  if(isOvercast(weatherCode)) return 'c'; // cloudy — solar would be sun but clouded
+  return solarStatus; // 's' or 'p', weather is fine
+}
+
+// ── LOAD ──
+async function loadCommune(key){
+  if(cache[key]){renderList();return;}
+  const c=key==='geo'?{label:'Autour de moi',lat:userLat,lng:userLng,radius:1000}:COMMUNES[key];
+  document.getElementById('mainContent').innerHTML='<div class="state-msg"><div class="loader"></div>Chargement des terrasses…</div>';
+  const [jsonData,w] = await Promise.all([fetchFromJSON(key), fetchWeather(c.lat,c.lng)]);
+  document.getElementById('weatherIcon').textContent=w.icon;
+  document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°${w.windSpeed?` · ${w.windDir} ${w.windSpeed} km/h`:''}`:w.desc;
+  window._weatherMap=w.hourlyMap||{};
+  const _uvEl=document.getElementById('uvInline');
+  if(_uvEl&&w.uvIndex!=null){const _p=Math.min(100,w.uvIndex/11*100).toFixed(1);_uvEl.innerHTML='<span class="uv-chip">UV '+w.uvIndex+' <span class="uv-chip-bar"><span class="uv-chip-dot" style="left:'+_p+'%"></span></span></span>';}
+  fetchAQI(c.lat,c.lng).then(function(aqi){const _el=document.getElementById('aqiInline');if(_el&&aqi.aqi!=null){const _p=Math.min(100,aqi.aqi/100*100).toFixed(1);_el.innerHTML='<span class="uv-chip">Air '+aqi.label+' <span class="uv-chip-bar"><span class="uv-chip-dot" style="left:'+_p+'%"></span></span></span>';}});
+  let cafes = jsonData.map(cf=>({...cf,dist:haversine(c.lat,c.lng,cf.lat,cf.lng)})).sort((a,b)=>a.dist-b.dist);
+  if(key==='geo') cafes = cafes.filter(cf => cf.dist <= (c.radius||1000)*3).slice(0,80);
+  if(!cafes.length){document.getElementById('mainContent').innerHTML='<div class="state-msg">Aucune terrasse trouvée.</div>';return;}
+  cache[key]=cafes.map(cafe=>{
+    const az = cafe.azimuth!=null ? cafe.azimuth : 180;
+    return {...cafe,azimuth:az,schedule:getSchedule(cafe.lat,cafe.lng,az)};
+  });
+  renderList();
+}
+
+// ── RENDER ──
+const stLabel=st=>{const m={pieton:'🚶 Piéton',zone_rencontre:'🏘 Zone 20',rue:'🏠 Rue 30',avenue:'🛣 Avenue',boulevard:'🚗 Boulevard',grand_boulevard:'🚗 Grand Bd'};return m[st]||null;};
+const azDir=az=>['N','NE','E','SE','S','SO','O','NO'][Math.round(az/45)%8];
+function renderList(){
+  const slot=getActiveSlot(),data=cache[activeCommune];if(!data)return;
+  const order={s:0,p:1,n:2};
+  const wMap=window._weatherMap||{};
+  const wCode=weatherForSlot(wMap,slot);
+  const cafes=[...data].map(c=>{
+    const solar=c.schedule[Math.min(slot,95)];
+    const eff=effectiveStatus(solar,wCode);
+    return{...c,statusNow:eff,solarStatus:solar};
+  }).sort((a,b)=>{
+    const order2={s:0,p:1,r:2,c:3,n:4};
+    const so=(order2[a.statusNow]??4)-(order2[b.statusNow]??4);
+    return so!==0?so:(a.dist??9999)-(b.dist??9999);
+  });
+  const sunN=cafes.filter(c=>c.statusNow==='s').length;
+  const partN=cafes.filter(c=>c.statusNow==='p').length;
+  const rainN=cafes.filter(c=>c.statusNow==='r').length;
+  const ref=displaySlot===null?'maintenant':'à '+slotToStr(slot);
+  // Weather banner
+  let banner='';
+  if(isRainy(wCode)) banner=`<div class="weather-banner rain">🌧 Pluie ${ref} — positions théoriques affichées</div>`;
+  else if(isOvercast(wCode)&&cafes.some(c=>c.solarStatus==='s')) banner=`<div class="weather-banner cloud">☁ Ciel couvert ${ref} — ensoleillement théorique</div>`;
+  document.getElementById('weatherBanner').innerHTML=banner;
+  let countHtml='';
+  if(sunN>0) countHtml=`<span>${sunN}</span> terrasse${sunN>1?'s':''} au soleil ${ref}`;
+  else if(partN>0) countHtml=`<span>${partN}</span> partiellement ensoleillée${partN>1?'s':''} ${ref}`;
+  else if(rainN>0) countHtml=`Pluie ${ref} — <span>${rainN}</span> terrasse${rainN>1?'s':''} théoriquement ensoleillée${rainN>1?'s':''}`;
+  else countHtml=`Aucune terrasse au soleil ${ref}`;
+  document.getElementById('sunCount').innerHTML=countHtml;
+  const labels={s:'Plein soleil',p:'Partiel',n:"À l'ombre",r:'🌧 Pluie',c:'☁ Couvert'};
+  document.getElementById('mainContent').innerHTML='<div class="cafe-list">'+cafes.map((cafe,idx)=>{
+    const win=getSunWindow(cafe.schedule,wMap),bar=cafe.schedule.map((s,i)=>`<div class="ds ${s}${i===slot?' active':''}"></div>`).join('');
+    let expand;
+    if(win && !win.theoretical){
+      expand=`<div class="sun-window">Soleil de <strong>${win.from}</strong> à <strong>${win.to}</strong></div>`;
+    } else if(win && win.theoretical){
+      expand=`<div class="sun-window theoretical">☁ Théorique : <strong>${win.from}</strong> – <strong>${win.to}</strong><br><span class="sun-window-note">Soleil possible si le temps s'améliore</span></div>`;
+    } else {
+      expand=`<div class="sun-window" style="opacity:0.3">Pas d'ensoleillement direct</div>`;
+    }
+    const cardCls=["s","p"].includes(cafe.statusNow)?cafe.statusNow:"n";
+    return`<div class="cafe-card ${cardCls}" onclick="toggleCard(${idx})"><div><div class="cafe-name-row"><div class="cafe-name">${cafe.name}</div>${cafe.rooftop?'<div class="rooftop-tag">🌇 rooftop</div>':''}${cafe.curated?'<div class="curated-dot"></div>':''}${cafe.address?`<div class="cafe-address">${cafe.address}</div><button class="copy-btn" onclick="copyAddress(event,'${cafe.name.replace(/'/g,"\\'")}${cafe.address?', '+cafe.address.replace(/'/g,"\\'"):''}')">⎘</button>`:''}</div><div class="cafe-meta-row">${cafe.dist!==undefined?`<div class="cafe-dist">${fmtDist(cafe.dist)}</div>`:''}</div></div><div class="sun-badge ${cafe.statusNow}">${labels[cafe.statusNow]}</div><div class="day-bar-mini">${bar}</div><div class="card-expanded" id="expand-${idx}"><div class="expand-ticks"><span>6h</span><span>10h</span><span>14h</span><span>18h</span><span>22h</span></div>${expand}<div class="azimuth-tag">Façade ${azDir(cafe.azimuth)} · ${cafe.azimuth}°</div>${cafe.street_type&&stLabel(cafe.street_type)?`<div class="street-type-tag">${stLabel(cafe.street_type)}</div>`:''}</div></div>`;
+  }).join('')+'</div>';
+}
+function toggleCard(idx){document.getElementById(`expand-${idx}`).classList.toggle('open');}
+
+// ── SLIDER ──
+function onSliderInput(){
+  const val=parseInt(document.getElementById('timeSlider').value);
+  displaySlot=val;
+  document.getElementById('selectedTime').textContent=slotToStr(val);
+  const _sw=document.getElementById('slotWeather');
+  if(_sw&&window._weatherMap){const _wc=weatherForSlot(window._weatherMap,val);const _wmo=WMO[_wc];if(_wmo)_sw.textContent=_wmo[0]+' '+_wmo[1];else _sw.textContent='';}
+  document.getElementById('sunStatusText').textContent=getSunStatusText(val);
+  updateArc(val);
+  if(cache[activeCommune])renderList();
+}
+
+// ── NAV ──
+function selectCommune(key){activeCommune=key;document.querySelectorAll('.commune-tab').forEach(t=>t.classList.toggle('active',t.dataset.commune===key));loadCommune(key);}
+function requestGeo(){if(!navigator.geolocation)return;document.getElementById('geoBtn').textContent='⟳ …';navigator.geolocation.getCurrentPosition(pos=>{userLat=pos.coords.latitude;userLng=pos.coords.longitude;document.getElementById('geoBtn').textContent='✓ Localisé';document.getElementById('geoBtn').classList.add('located');selectGeo();},()=>{document.getElementById('geoBtn').textContent='📍 Me localiser';},{enableHighAccuracy:true,timeout:12000});}
+function selectGeo(){if(!userLat){requestGeo();return;}activeCommune='geo';document.querySelectorAll('.commune-tab').forEach(t=>t.classList.toggle('active',t.dataset.commune==='geo'));loadCommune('geo');}
+
+// ── COPY ──
+function copyAddress(e,text){e.stopPropagation();navigator.clipboard.writeText(text).then(()=>{const btn=e.currentTarget;btn.classList.add('copied');btn.textContent='✓';const t=document.getElementById('copyToast');t.classList.add('show');setTimeout(()=>{btn.classList.remove('copied');btn.textContent='⎘';t.classList.remove('show');},1800);});}
+
+// ── INIT ──
+function initArc() {
+  drawArc();
+  const initSlot = currentSlot();
+  document.getElementById('timeSlider').value = initSlot;
+  document.getElementById('selectedTime').textContent = slotToStr(initSlot);
+  document.getElementById('sunStatusText').textContent = getSunStatusText(initSlot);
+  updateArc(initSlot);
+}
+// Wait for fonts + layout before computing rects
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => requestAnimationFrame(initArc));
+} else {
+  window.addEventListener('load', () => requestAnimationFrame(initArc));
+}
+window.addEventListener('resize', () => { computeArcMapping(); drawArc(); updateArc(getActiveSlot()); });
+fetchWeather(COMMUNES['ixelles'].lat,COMMUNES['ixelles'].lng).then(w=>{document.getElementById('weatherIcon').textContent=w.icon;document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°`:w.desc;});
+loadCommune('ixelles');
+</script>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-credit">
+    with 🩷 by <a href="https://www.linkedin.com/in/olivier-de-locht/" target="_blank" rel="noopener">ol_dl</a>
+  </div>
+  <button class="footer-suggest" onclick="openSuggest()">+ Suggérer une terrasse</button>
+</footer>
+
+<!-- SUGGEST MODAL -->
+<div class="modal-overlay" id="suggestModal" onclick="closeSuggestOutside(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Suggérer une terrasse</div>
+      <button class="modal-close" onclick="closeSuggest()">✕</button>
+    </div>
+    <div class="modal-desc">
+      Tu connais une terrasse ensoleillée qui manque à la liste ?<br>
+      Dis-nous tout — on vérifie et on ajoute.
+    </div>
+    <div class="modal-fields">
+      <input class="modal-field" id="suggestName" placeholder="Nom de l'établissement" type="text">
+      <input class="modal-field" id="suggestAddress" placeholder="Adresse (rue, commune)" type="text">
+      <input class="modal-field" id="suggestNote" placeholder="Note (optionnel) — orientation, terrasse couverte…" type="text">
+    </div>
+    <button class="modal-send" onclick="sendSuggest()">Envoyer la suggestion →</button>
+  </div>
+</div>
+
+<script>
+function openSuggest() {
+  document.getElementById('suggestModal').classList.add('open');
+}
+function closeSuggest() {
+  document.getElementById('suggestModal').classList.remove('open');
+}
+function closeSuggestOutside(e) {
+  if (e.target === document.getElementById('suggestModal')) closeSuggest();
+}
+function sendSuggest() {
+  const name    = document.getElementById('suggestName').value.trim();
+  const address = document.getElementById('suggestAddress').value.trim();
+  const note    = document.getElementById('suggestNote').value.trim();
+  if (!name) { document.getElementById('suggestName').focus(); return; }
+  const subject = encodeURIComponent('SunSpots · Suggestion terrasse : ' + name);
+  const body    = encodeURIComponent(
+    'Nom : ' + name + '\n' +
+    'Adresse : ' + (address || '—') + '\n' +
+    'Note : ' + (note || '—') + '\n\n' +
+    '(envoyé depuis SunSpots)'
+  );
+  window.location.href = 'mailto:hello@appvelvet.com?subject=' + subject + '&body=' + body;
+  closeSuggest();
+}
+</script>
+
+</body>
+</html>

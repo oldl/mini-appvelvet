@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WSJF Turbo – Instant Backlog Prioritization Tool</title>
+<meta name="description" content="WSJF Turbo is a lightweight tool for product managers to prioritize backlog features using the Weighted Shortest Job First method. Score business value, time criticality, risk reduction and effort to instantly rank priorities and plan your sprint.">
+<meta name="keywords" content="WSJF, weighted shortest job first, backlog prioritization, product management tool, agile prioritization, sprint planning, backlog ranking, product owner tools">
+<meta name="author" content="Appvelvet">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mini.appvelvet.com/wsjf-turbo">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="WSJF Turbo – Instant Backlog Prioritization Tool">
+<meta property="og:description" content="Add your features, score Business Value, Time Criticality, Risk Reduction and Effort, and instantly see your backlog ranked using WSJF. A simple prioritization tool for product managers.">
+<meta property="og:url" content="https://mini.appvelvet.com/wsjf-turbo">
+<meta property="og:image" content="https://mini.appvelvet.com/wsjf-turbo/og.png">
+<meta property="og:site_name" content="Appvelvet Mini Apps">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="WSJF Turbo – Instant Backlog Prioritization Tool">
+<meta name="twitter:description" content="Prioritize your product backlog in seconds using WSJF. Score features and instantly rank priorities for your next sprint.">
+<meta name="twitter:image" content="https://mini.appvelvet.com/wsjf-turbo/og.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:        #0F0E11;
+    --surface:   #17151d;
+    --surface2:  #1c1a24;
+    --border:    #1e1c24;
+    --border2:   #2a2735;
+    --accent:    #f02d7d;
+    --accent-bg: rgba(240,45,125,0.10);
+    --accent-bd: rgba(240,45,125,0.28);
+    --accent2:   #ff6eb0;
+    --text:      #e2e0e8;
+    --text-2:    #a09eb0;
+    --text-3:    #4a4760;
+    --green:     #4ade80;
+    --green-bg:  rgba(74,222,128,0.1);
+    --red:       #f87171;
+    --red-bg:    rgba(248,113,113,0.1);
+    --orange:    #fb923c;
+    --yellow:    #fbbf24;
+    --sans:      'Inter', sans-serif;
+    --mono:      'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+  /* TOPBAR */
+  .topbar { height: 48px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 12px; position: sticky; top: 0; z-index: 100; background: rgba(15,14,17,0.92); backdrop-filter: blur(12px); }
+  .logo { width: 22px; height: 22px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .logo svg { width: 12px; height: 12px; fill: #fff; }
+  .app-name { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+  .topbar-slash { color: var(--text-3); font-size: 16px; font-weight: 300; }
+  .topbar-sub { font-size: 13px; font-weight: 400; color: var(--text-2); }
+  .topbar-spacer { flex: 1; }
+  .sprint-badge { font-size: 11px; font-weight: 500; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); padding: 3px 10px; border-radius: 20px; }
+
+  /* SPRINT CAPACITY */
+  .capacity-wrap { display: flex; align-items: center; gap: 8px; }
+  .capacity-wrap label { font-size: 11px; font-weight: 500; color: var(--text-3); white-space: nowrap; }
+  .capacity-input {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 6px; color: var(--text); font-family: var(--mono);
+    font-size: 12px; font-weight: 600; padding: 4px 8px; width: 56px;
+    outline: none; text-align: center; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .capacity-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+  .capacity-input::placeholder { color: var(--text-3); font-weight: 400; }
+
+  /* CAPACITY PROGRESS BAR */
+  .capacity-bar-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .capacity-bar-label { font-size: 11px; font-weight: 500; color: var(--text-3); white-space: nowrap; }
+  .capacity-bar-track { flex: 1; height: 6px; background: var(--border2); border-radius: 3px; position: relative; overflow: hidden; }
+  .capacity-bar-fill {
+    position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px;
+    transition: width 0.4s ease, background 0.3s;
+    background: var(--green);
+  }
+  .capacity-bar-fill.warn { background: var(--orange); }
+  .capacity-bar-fill.over { background: var(--red); }
+  .capacity-bar-pts { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text-2); white-space: nowrap; }
+  .capacity-bar-pts .used { color: var(--text); }
+  .capacity-bar-pts .over-text { color: var(--red); }
+
+  /* CUT LINE IN RANKING */
+  .sprint-cutline {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 10px; margin: 4px 0; position: relative;
+  }
+  .sprint-cutline-bar { flex: 1; height: 1px; background: var(--green); opacity: 0.5; }
+  .sprint-cutline-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--green); background: var(--bg);
+    padding: 0 8px; white-space: nowrap; opacity: 0.8;
+  }
+
+  /* IN / OUT SPRINT ROW STATES */
+  .feat-row.out-sprint { opacity: 0.45; }
+  .feat-row.out-sprint:hover { opacity: 0.7; }
+
+  /* LAYOUT */
+  .app { display: grid; grid-template-columns: 310px 1fr; height: calc(100vh - 48px); }
+
+  /* SIDEBAR */
+  .sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .sidebar-header { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .sidebar-title { font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; }
+  .edit-badge { font-size: 9px; font-weight: 600; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); padding: 1px 7px; border-radius: 20px; display: none; }
+  .edit-badge.show { display: inline; }
+  .sidebar-body { padding: 14px 16px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; font-weight: 500; color: var(--text-3); letter-spacing: 0.3px; }
+  .field input[type="text"] { background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--sans); font-size: 13px; padding: 7px 10px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%; }
+  .field input[type="text"]::placeholder { color: var(--text-3); }
+  .field input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+  .divider { height: 1px; background: var(--border); margin: 2px 0; }
+
+  .slider-group { display: flex; flex-direction: column; gap: 7px; }
+  .slider-row { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 8px; }
+  .slider-name { font-size: 11px; font-weight: 500; color: var(--text-2); }
+  .slider-name small { display: block; font-size: 9px; color: var(--text-3); font-weight: 400; margin-top: 1px; }
+  .slider-val { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); width: 20px; text-align: right; }
+  input[type="range"] { -webkit-appearance: none; width: 100%; height: 3px; background: var(--border2); border-radius: 2px; outline: none; cursor: pointer; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 0 3px var(--accent-bg); transition: box-shadow 0.15s; }
+  input[type="range"]:hover::-webkit-slider-thumb { box-shadow: 0 0 0 5px var(--accent-bg); }
+  .effort-label { font-size: 9px; color: var(--text-3); margin-top: -3px; font-style: italic; }
+
+  /* CONFIDENCE */
+  .conf-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .conf-header { display: flex; justify-content: space-between; align-items: center; }
+  .conf-label { font-size: 11px; font-weight: 500; color: var(--text-2); }
+  .conf-label small { display: block; font-size: 9px; color: var(--text-3); font-weight: 400; margin-top: 1px; }
+  .conf-stars { display: flex; gap: 3px; }
+  .conf-star { width: 22px; height: 22px; border-radius: 5px; background: var(--surface); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-family: var(--mono); cursor: pointer; transition: all 0.1s; color: var(--text-3); font-weight: 600; }
+  .conf-star.active { background: var(--accent-bg); border-color: var(--accent-bd); color: var(--accent); }
+  .conf-star:hover { border-color: var(--accent-bd); color: var(--accent2); }
+
+  .formula-chip { background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 12px; }
+  .formula-chip-label { font-size: 9px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+  .formula-chip-text { font-family: var(--mono); font-size: 11px; color: var(--text-2); line-height: 1.8; }
+  .formula-chip-text .hl { color: var(--accent); font-weight: 700; }
+
+  .btn-row { display: flex; gap: 6px; }
+  .btn-add { flex: 1; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 9px; cursor: pointer; transition: opacity 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-add:hover { opacity: 0.88; }
+  .btn-add:active { transform: scale(0.98); }
+  .btn-add.editing { background: var(--green); color: #0a1a0a; }
+  .btn-cancel-edit { background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; color: var(--text-2); font-family: var(--sans); font-size: 12px; font-weight: 500; padding: 9px 12px; cursor: pointer; transition: all 0.15s; display: none; }
+  .btn-cancel-edit:hover { border-color: var(--red); color: var(--red); }
+  .btn-cancel-edit.show { display: block; }
+
+  /* PANEL */
+  .panel { display: flex; flex-direction: column; overflow: hidden; }
+  .tabs { display: flex; align-items: center; border-bottom: 1px solid var(--border); padding: 0 16px; gap: 2px; flex-shrink: 0; }
+  .tab { font-size: 12px; font-weight: 500; color: var(--text-3); padding: 12px 10px 11px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--sans); }
+  .tab:hover { color: var(--text-2); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab.ai-tab { color: var(--accent); }
+  .tab.ai-tab.active { border-bottom-color: var(--accent2); color: var(--accent2); }
+  .tab-content { display: none; flex: 1; overflow-y: auto; padding: 18px 20px; flex-direction: column; gap: 12px; }
+  .tab-content.active { display: flex; }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 11px 12px; }
+  .stat-label { font-size: 10px; font-weight: 500; color: var(--text-3); margin-bottom: 3px; }
+  .stat-value { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; line-height: 1; font-family: var(--mono); }
+  .stat-value.pink { color: var(--accent); }
+
+  /* CUT BANNER */
+  .cut-banner { background: rgba(251,146,60,0.07); border: 1px solid rgba(251,146,60,0.22); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease both; }
+  .cut-icon { font-size: 20px; flex-shrink: 0; }
+  .cut-text { flex: 1; }
+  .cut-title { font-size: 12px; font-weight: 700; color: var(--orange); margin-bottom: 2px; }
+  .cut-sub { font-size: 11px; color: var(--text-2); line-height: 1.5; }
+  .cut-sub strong { color: var(--green); }
+  .cut-badge { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--green); background: var(--green-bg); border: 1px solid rgba(74,222,128,0.2); padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+
+  /* TABLE */
+  .table-header { display: grid; grid-template-columns: 26px 1fr 28px 28px 28px 28px 46px 52px 50px 60px 56px 52px; gap: 5px; padding: 6px 10px; border-bottom: 1px solid var(--border); margin-bottom: 2px; }
+  .th { font-size: 9px; font-weight: 600; color: var(--text-3); letter-spacing: 0.5px; text-transform: uppercase; }
+  .th.right { text-align: right; } .th.center { text-align: center; }
+
+  .feature-list { display: flex; flex-direction: column; gap: 2px; }
+  .feat-row { display: grid; grid-template-columns: 26px 1fr 28px 28px 28px 28px 46px 52px 50px 60px 56px 52px; align-items: center; gap: 5px; padding: 8px 10px; border-radius: 8px; transition: background 0.1s; animation: slideIn 0.2s ease both; }
+  .feat-row:hover { background: var(--surface); }
+  .feat-row.is-editing { background: var(--accent-bg) !important; }
+  /* mobile sub-rows hidden on desktop */
+  .feat-row-top, .feat-row-scores, .feat-row-bottom { display: contents; }
+  .feat-rank { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--text-3); }
+  .feat-name { font-size: 12px; font-weight: 500; color: var(--text); letter-spacing: -0.1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .feat-name-link { cursor: pointer; }
+  .feat-name-link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+  .feat-num { font-family: var(--mono); font-size: 11px; color: var(--text-2); text-align: center; }
+  .feat-score-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+  .feat-score { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; line-height: 1; }
+  .feat-score.top { color: var(--accent); }
+  .feat-bar { height: 2px; background: var(--border2); border-radius: 1px; width: 100%; }
+  .feat-bar-fill { height: 100%; border-radius: 1px; background: var(--accent); transition: width 0.5s ease; }
+  .feat-cod { font-family: var(--mono); font-size: 11px; color: var(--orange); text-align: center; font-weight: 600; }
+  .feat-conf { display: flex; gap: 2px; justify-content: center; }
+  .conf-pip { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); transition: background 0.1s; }
+  .conf-pip.on { background: var(--yellow); }
+  .feat-tag { font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 20px; text-align: center; }
+  .feat-tag.now { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-bd); }
+  .feat-tag.next { background: rgba(251,146,60,0.1); color: var(--orange); border: 1px solid rgba(251,146,60,0.2); }
+  .feat-tag.defer { background: var(--surface); color: var(--text-3); border: 1px solid var(--border2); }
+  .row-actions { display: flex; gap: 3px; }
+  .btn-edit, .btn-del { width: 24px; height: 24px; background: none; border: 1px solid transparent; border-radius: 5px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: var(--sans); flex-shrink: 0; color: var(--text-3); }
+  .btn-edit:hover { border-color: var(--accent-bd); color: var(--accent); background: var(--accent-bg); }
+  .btn-del:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+  /* EMPTY */
+  .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+  .empty-icon { font-size: 32px; opacity: 0.4; }
+  .empty-title { font-size: 13px; font-weight: 500; color: var(--text-2); }
+  .empty-sub { font-size: 12px; color: var(--text-3); }
+
+  /* RADAR */
+  .radar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .radar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .radar-card-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .radar-card-score { font-family: var(--mono); font-size: 10px; color: var(--accent); font-weight: 600; margin-bottom: 10px; }
+  .radar-canvas-wrap { height: 180px; position: relative; }
+
+  /* SCENARIO */
+  .select-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .select-row label { font-size: 12px; font-weight: 500; color: var(--text-2); }
+  select { background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: var(--sans); font-size: 13px; font-weight: 500; padding: 6px 10px; outline: none; cursor: pointer; flex: 1; transition: border-color 0.15s; }
+  select:focus { border-color: var(--accent); }
+  .whatif-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .whatif-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 10px; text-align: center; transition: all 0.15s; }
+  .whatif-card:hover { border-color: var(--border2); }
+  .whatif-card.current { border-color: var(--accent); background: var(--accent-bg); }
+  .whatif-effort { font-size: 10px; font-weight: 500; color: var(--text-3); margin-bottom: 8px; }
+  .whatif-score { font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--text-2); line-height: 1; letter-spacing: -0.5px; }
+  .whatif-card.current .whatif-score { color: var(--accent); }
+  .whatif-delta { font-size: 10px; font-weight: 600; margin-top: 6px; }
+  .whatif-delta.up { color: var(--green); } .whatif-delta.down { color: var(--red); } .whatif-delta.same { color: var(--text-3); }
+  .compare-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .compare-box-title { font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 14px; }
+  .cbar-row { display: grid; grid-template-columns: 100px 1fr 44px; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .cbar-label { font-size: 11px; font-weight: 500; color: var(--text-2); text-align: right; }
+  .cbar-track { height: 3px; background: var(--border2); border-radius: 2px; position: relative; }
+  .cbar-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.5s ease; }
+  .cbar-fill.alt { background: var(--green); }
+  .cbar-val { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent); }
+  .cbar-val.alt { color: var(--green); }
+
+  /* BRIEF AI */
+  .btn-gen { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 600; padding: 7px 16px; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+  .btn-gen:hover { opacity: 0.88; } .btn-gen:disabled { opacity: 0.35; cursor: not-allowed; }
+  .brief-loading { display: flex; align-items: center; gap: 10px; color: var(--text-3); font-size: 12px; font-weight: 500; padding: 12px 0; }
+  .dots span { display: inline-block; width: 5px; height: 5px; background: var(--accent); border-radius: 50%; margin: 0 2px; animation: bounce 1.2s infinite; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; } .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100% { transform:scale(0.5);opacity:0.3; } 40% { transform:scale(1);opacity:1; } }
+  .brief-blocks { display: flex; flex-direction: column; gap: 10px; }
+  .brief-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .brief-block-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .brief-block-title { font-size: 10px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; }
+  .btn-copy { background: none; border: 1px solid var(--border2); border-radius: 5px; color: var(--text-3); font-family: var(--mono); font-size: 9px; padding: 2px 8px; cursor: pointer; transition: all 0.15s; }
+  .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+  .us-text { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.7; }
+  .us-text .kw { color: var(--accent); }
+  .brief-desc { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .ac-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .ac-list li { font-size: 12px; font-family: var(--mono); color: var(--text-2); padding-left: 18px; position: relative; line-height: 1.6; }
+  .ac-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-size: 11px; }
+  .brief-badge { display: inline-flex; align-items: center; gap: 10px; background: var(--accent-bg); border: 1px solid var(--accent-bd); border-radius: 8px; padding: 8px 14px; margin-bottom: 4px; }
+  .brief-badge-score { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--accent); line-height: 1; letter-spacing: -1px; }
+  .brief-badge-meta { font-size: 10px; color: var(--text-3); line-height: 1.6; }
+  .rationale-block { background: var(--accent-bg); border: 1px solid var(--accent-bd); border-radius: 10px; padding: 12px 16px; }
+  .rationale-text { font-size: 12px; color: var(--text-2); line-height: 1.6; font-style: italic; }
+
+  /* EXPORT */
+  .export-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-export { background: var(--surface); border: 1px solid var(--border2); border-radius: 7px; color: var(--text-2); font-family: var(--sans); font-size: 12px; font-weight: 500; padding: 7px 14px; cursor: pointer; transition: all 0.15s; }
+  .btn-export:hover { border-color: var(--accent); color: var(--text); }
+  .btn-export.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-export.primary:hover { opacity: 0.88; color: #fff; }
+  #slide-preview { background: #fff; color: #111; font-family: var(--sans); border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; box-shadow: 0 4px 24px rgba(0,0,0,0.15); }
+  .slide-top { background: #0F0E11; padding: 20px 28px 16px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .slide-title { font-family: var(--sans); font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.4px; }
+  .slide-sub { font-size: 11px; color: #555; margin-top: 3px; font-family: var(--mono); }
+  .slide-meta { font-family: var(--mono); font-size: 10px; color: #555; text-align: right; line-height: 1.6; }
+  .slide-body { padding: 20px 28px; }
+  .slide-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .slide-table th { font-size: 9px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9ca3af; padding: 7px 8px; border-bottom: 1px solid #f3f4f6; text-align: left; }
+  .slide-table td { padding: 9px 8px; border-bottom: 1px solid #f9fafb; vertical-align: middle; }
+  .slide-badge { display: inline-block; background: #f02d7d; color: #fff; font-weight: 700; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-family: var(--mono); }
+  .slide-footer { padding: 10px 28px 14px; font-family: var(--mono); font-size: 9px; color: #d1d5db; border-top: 1px solid #f3f4f6; display: flex; justify-content: space-between; }
+
+  @media print {
+    body { background: white; }
+    .topbar, .sidebar, .tabs, .export-actions { display: none !important; }
+    .app { display: block; } .panel { display: block; }
+    .tab-content { display: block !important; }
+    #tab-export { display: block !important; padding: 0; }
+    #slide-preview { border: none; box-shadow: none; }
+  }
+
+  /* ── LIGHT MODE ── */
+  body.light {
+    --bg:        #f7f6f9;
+    --surface:   #ffffff;
+    --surface2:  #f0eef5;
+    --border:    #e4e1ee;
+    --border2:   #d1cde3;
+    --text:      #1a1825;
+    --text-2:    #5c5878;
+    --text-3:    #a09eb8;
+    --green-bg:  rgba(22,163,74,0.08);
+  }
+  body.light .topbar { background: rgba(247,246,249,0.95); }
+  body.light .sprint-cutline-label { background: var(--bg); }
+  body.light input[type="range"] { background: var(--border2); }
+  body.light select { background: var(--surface); }
+  body.light .capacity-input { background: var(--surface); }
+  body.light .slide-top { background: #1a1825; }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    width: 32px; height: 18px; border-radius: 9px;
+    background: var(--border2); border: 1px solid var(--border2);
+    cursor: pointer; position: relative; transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .theme-toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--text-3); transition: transform 0.2s, background 0.2s;
+  }
+  body.light .theme-toggle { background: var(--accent-bg); border-color: var(--accent-bd); }
+  body.light .theme-toggle::after { background: var(--accent); transform: translateX(14px); }
+  .theme-toggle-wrap { display: flex; align-items: center; gap: 6px; }
+  .theme-toggle-label { font-size: 10px; font-weight: 500; color: var(--text-3); }
+
+  /* NUMBER INPUT — hide default arrows, accent style */
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .capacity-input { -webkit-appearance: none; }
+  .spin-btns { display: flex; flex-direction: column; gap: 1px; }
+  .spin-btn {
+    width: 16px; height: 11px; background: none; border: none;
+    color: var(--accent); font-size: 9px; cursor: pointer; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 3px; transition: background 0.1s;
+  }
+  .spin-btn:hover { background: var(--accent-bg); }
+  .capacity-wrap { display: flex; align-items: center; gap: 6px; }
+
+  /* SLIDER FILL — dynamic via JS, base */
+  input[type="range"] {
+    background: linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--border2) 50%, var(--border2) 100%);
+  }
+
+  /* CUT BADGE — inline, no border box */
+  .cut-badge {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    color: var(--green); white-space: nowrap;
+  }
+  .cut-title { font-size: 12px; font-weight: 700; color: var(--orange); display: flex; align-items: center; gap: 8px; }
+
+  /* TOOLTIP */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute; bottom: calc(100% + 6px); left: 0;
+    background: #1a1825; color: #e2e0e8;
+    font-size: 11px; font-weight: 500; font-family: var(--sans);
+    padding: 5px 9px; border-radius: 6px; white-space: nowrap;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border: 1px solid #2a2735;
+  }
+  [data-tooltip]:hover::after { opacity: 1; }
+
+  /* RADAR SPINNER */
+  .radar-spinner {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 12px; padding: 40px;
+    grid-column: 1 / -1;
+  }
+  .spin-ring {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 3px solid var(--border2);
+    border-top-color: var(--accent);
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .radar-spinner-label { font-size: 12px; color: var(--text-3); font-weight: 500; }
+
+  /* WWSJF col */
+  .feat-wwsjf { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent2); text-align: right; }
+  .wwsjf-label { font-size: 8px; color: var(--text-3); font-weight: 400; text-align: right; letter-spacing: 0.2px; }
+
+  /* FLIP DECISION */
+  .btn-flip {
+    width: 24px; height: 24px; background: none;
+    border: 1px solid transparent; border-radius: 5px;
+    font-size: 11px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: all 0.15s; color: var(--text-3);
+    flex-shrink: 0;
+  }
+  .btn-flip:hover { border-color: var(--accent-bd); color: var(--accent2); background: var(--accent-bg); }
+  .btn-flip.loading { animation: spin 0.8s linear infinite; cursor: default; color: var(--accent); }
+
+  .flip-result {
+    grid-column: 1 / -1; font-size: 11px; color: var(--text-2);
+    background: var(--surface); border-left: 2px solid var(--accent);
+    border-radius: 0 6px 6px 0; padding: 8px 12px; margin: 0 10px 2px;
+    line-height: 1.6; animation: slideIn 0.2s ease both;
+  }
+  .flip-result .flip-up { color: var(--green); font-weight: 600; }
+  .flip-result .flip-down { color: var(--red); font-weight: 600; }
+
+  /* FOOTER */
+  .app-footer {
+    text-align: center; padding: 14px; font-size: 11px; color: var(--text-3);
+    border-top: 1px solid var(--border); font-family: var(--sans);
+    flex-shrink: 0;
+  }
+  .app-footer a { color: var(--accent); text-decoration: none; }
+  .app-footer a:hover { text-decoration: underline; }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ── RESPONSIVE ── */
+  .sidebar-toggle { display: none; }
+  .mob-tag { display: none; }
+
+  @media (max-width: 768px) {
+
+    /* — Topbar — */
+    .topbar { padding: 0 10px; gap: 6px; overflow: hidden; }
+    .topbar-sub, .topbar-slash { display: none; }
+    .theme-toggle-label { display: none; }
+    .sprint-badge { display: none; }
+    .capacity-wrap label { display: none; }
+    .capacity-input { width: 40px; font-size: 11px; padding: 3px 6px; }
+    .spin-btns { display: none; }
+    .topbar-spacer { min-width: 0; }
+
+    .sidebar-toggle {
+      display: flex !important; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600; color: var(--accent);
+      background: var(--accent-bg); border: 1px solid var(--accent-bd);
+      border-radius: 6px; padding: 4px 10px; cursor: pointer;
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* — Layout — */
+    .app { grid-template-columns: 1fr; height: auto; min-height: calc(100vh - 48px); }
+
+    /* — Sidebar — */
+    .sidebar {
+      border-right: none; border-bottom: 1px solid var(--border);
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+      border-bottom-width: 0;
+    }
+    .sidebar.open { max-height: 1000px; border-bottom-width: 1px; }
+
+    /* — Panel — */
+    .panel { overflow: visible; }
+    .tab-content { padding: 12px 10px; }
+    .tabs { padding: 0 10px; overflow-x: auto; gap: 0; }
+    .tab { padding: 10px 8px 9px; font-size: 11px; white-space: nowrap; }
+
+    /* — Stats — */
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .stats-row .stat-card:last-child { grid-column: 1 / -1; }
+    .stat-value { font-size: 18px; }
+
+    /* — Table → adaptive card layout — */
+    #feat-table-header { display: none !important; }
+    .ranking-scroll { overflow: visible; }
+    .feat-row {
+      display: flex; flex-direction: row; flex-wrap: wrap;
+      align-items: center; gap: 6px 10px;
+      min-width: 0; padding: 10px 12px;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--surface);
+    }
+    .feat-row:hover { background: var(--surface2); }
+    .feat-row-top { display: contents; }
+    .feat-row-scores { display: contents; }
+    .feat-row-bottom { display: contents; }
+
+    .feat-rank { flex-shrink: 0; }
+    .feat-name { flex: 1; min-width: 100px; white-space: normal; overflow: visible; text-overflow: unset; font-size: 13px; font-weight: 600; }
+    .feat-score-wrap { flex-shrink: 0; }
+    .feat-bar { display: none; }
+    .feat-score { font-size: 15px; }
+    .feat-wwsjf { flex-shrink: 0; font-size: 11px; }
+    .wwsjf-label { display: inline; font-size: 9px; color: var(--text-3); margin-left: 2px; }
+    .feat-num { display: none; }
+    .feat-cod { flex-shrink: 0; font-size: 11px; color: var(--orange); font-family: var(--mono); font-weight: 600; }
+    .feat-conf { display: flex; gap: 2px; flex-shrink: 0; }
+    .mob-tag { display: inline; flex-shrink: 0; }
+    .row-actions { display: flex; gap: 4px; flex-shrink: 0; margin-left: auto; }
+
+    /* — Radar — */
+    .radar-grid { grid-template-columns: 1fr !important; }
+
+    /* — What-if — */
+    .whatif-grid { grid-template-columns: repeat(3, 1fr); }
+    .cbar-row { grid-template-columns: 80px 1fr 36px; gap: 8px; }
+
+    /* — Capacity bar — */
+    .capacity-bar-wrap { flex-wrap: wrap; gap: 6px; }
+  }
+
+  @media (max-width: 480px) {
+    .whatif-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-value { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><svg viewBox="0 0 24 24"><path d="M13 3L4 14h8l-1 7 9-11h-8l1-7z"/></svg></div>
+  <span class="app-name">WSJF Turbo</span>
+  <span class="topbar-slash">/</span>
+  <span class="topbar-sub">Priority Engine</span>
+  <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">＋ Add feature</button>
+  <div class="topbar-spacer"></div>
+  <div class="capacity-wrap">
+    <label style="font-size:11px;font-weight:500;color:var(--text-3);white-space:nowrap;">Sprint cap.</label>
+    <input type="number" class="capacity-input" id="sprint-capacity" min="1" max="999" placeholder="pts" oninput="renderRanking()" style="width:52px;">
+    <div class="spin-btns">
+      <button class="spin-btn" onclick="stepCapacity(1)">▲</button>
+      <button class="spin-btn" onclick="stepCapacity(-1)">▼</button>
+    </div>
+  </div>
+  <div class="theme-toggle-wrap">
+    <span class="theme-toggle-label" id="theme-label">Dark</span>
+    <div class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark"></div>
+  </div>
+  <div class="sprint-badge" id="sprint-badge">Sprint · Live</div>
+</div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title" id="sidebar-title">New feature</div>
+      <span class="edit-badge" id="edit-badge">editing</span>
+    </div>
+    <div class="sidebar-body">
+
+      <div class="field">
+        <label>Feature name</label>
+        <input type="text" id="feat-name" placeholder="e.g. SSO Integration…" />
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="slider-group">
+        <div class="slider-row">
+          <div class="slider-name">Business Value <small>Economic benefit</small></div>
+          <div class="slider-val" id="v-bv">5</div>
+        </div>
+        <input type="range" id="sl-bv" min="1" max="10" value="5" oninput="updateSlider('bv',this.value)">
+
+        <div class="slider-row">
+          <div class="slider-name">Time Criticality <small>Cost of delay over time</small></div>
+          <div class="slider-val" id="v-tc">5</div>
+        </div>
+        <input type="range" id="sl-tc" min="1" max="10" value="5" oninput="updateSlider('tc',this.value)">
+
+        <div class="slider-row">
+          <div class="slider-name">Risk Reduction <small>Opportunity enablement</small></div>
+          <div class="slider-val" id="v-rr">5</div>
+        </div>
+        <input type="range" id="sl-rr" min="1" max="10" value="5" oninput="updateSlider('rr',this.value)">
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="slider-group">
+        <div class="slider-row">
+          <div class="slider-name">Effort <small>1 = XS · 3 = M · 5 = XL</small></div>
+          <div class="slider-val" id="v-ef">3</div>
+        </div>
+        <input type="range" id="sl-ef" min="1" max="5" value="3" oninput="updateSlider('ef',this.value)">
+        <div class="effort-label">Relative job size in story points</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="conf-wrap">
+        <div class="conf-header">
+          <div class="conf-label">Confidence <small>Certainty in estimates</small></div>
+          <div class="conf-stars" id="conf-stars">
+            <div class="conf-star active" data-v="1" onclick="setConf(1)">1</div>
+            <div class="conf-star active" data-v="2" onclick="setConf(2)">2</div>
+            <div class="conf-star active" data-v="3" onclick="setConf(3)">3</div>
+            <div class="conf-star" data-v="4" onclick="setConf(4)">4</div>
+            <div class="conf-star" data-v="5" onclick="setConf(5)">5</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="formula-chip">
+        <div class="formula-chip-label">Formulas</div>
+        <div class="formula-chip-text">
+          <span class="hl">WSJF</span> = (BV + TC + RR) / E<br>
+          <span class="hl">CoD</span>&nbsp;&nbsp;= BV + TC + RR<br>
+          <span class="hl">Conf</span>&nbsp;= 1 (low) → 5 (high)
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-add" id="btn-add" onclick="submitFeature()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span id="btn-add-label">Add feature</span>
+        </button>
+        <button class="btn-cancel-edit" id="btn-cancel" onclick="cancelEdit()">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MAIN PANEL -->
+  <div class="panel">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('ranking',this)">Ranking</button>
+      <button class="tab" onclick="switchTab('radar',this)">Radar</button>
+      <button class="tab" onclick="switchTab('scenario',this)">What-if</button>
+      <button class="tab" onclick="switchTab('export',this)">Export</button>
+    </div>
+
+    <!-- RANKING -->
+    <div id="tab-ranking" class="tab-content active">
+      <div id="stats-bar" class="stats-row" style="display:none;">
+        <div class="stat-card"><div class="stat-label">Features</div><div class="stat-value" id="stat-count">0</div></div>
+        <div class="stat-card"><div class="stat-label">Top WSJF</div><div class="stat-value pink" id="stat-max">—</div></div>
+        <div class="stat-card"><div class="stat-label">Avg WSJF</div><div class="stat-value" id="stat-avg">—</div></div>
+        <div class="stat-card"><div class="stat-label">Top CoD</div><div class="stat-value" id="stat-cod">—</div></div>
+        <div class="stat-card"><div class="stat-label">Priority #1</div><div class="stat-value" id="stat-top" style="font-size:11px;font-family:var(--sans);font-weight:600;">—</div></div>
+      </div>
+
+      <div id="cut-banner" style="display:none;"></div>
+      <div id="capacity-bar-wrap" class="capacity-bar-wrap" style="display:none;">
+        <div class="capacity-bar-label">Sprint load</div>
+        <div class="capacity-bar-track">
+          <div class="capacity-bar-fill" id="capacity-bar-fill"></div>
+        </div>
+        <div class="capacity-bar-pts" id="capacity-bar-pts"></div>
+      </div>
+
+      <div class="ranking-scroll">
+        <div id="feat-table-header" class="table-header" style="display:none;">
+          <div class="th">#</div>
+          <div class="th">Feature</div>
+          <div class="th center">BV</div><div class="th center">TC</div>
+          <div class="th center">RR</div><div class="th center">E</div>
+          <div class="th right">WSJF</div>
+          <div class="th right" style="color:var(--accent2)">W.WSJF</div>
+          <div class="th center">CoD</div>
+          <div class="th center">Conf</div>
+          <div class="th">Status</div>
+          <div class="th"></div>
+        </div>
+
+        <div id="ranking-list" class="feature-list">
+          <div class="empty-state">
+            <div class="empty-icon">⚡</div>
+            <div class="empty-title">No features yet</div>
+            <div class="empty-sub">Add your first feature in the sidebar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RADAR -->
+    <div id="tab-radar" class="tab-content">
+      <div id="radar-spinner" class="radar-grid" style="display:none;">
+        <div class="radar-spinner" style="grid-column:1/-1;">
+          <div class="spin-ring"></div>
+          <div class="radar-spinner-label">Rendering charts…</div>
+        </div>
+      </div>
+      <div id="radar-grid" class="radar-grid" style="display:none;"></div>
+      <div id="radar-empty" class="empty-state">
+        <div class="empty-icon">📡</div>
+        <div class="empty-title">No data to display</div>
+        <div class="empty-sub">Add features to see radar charts</div>
+      </div>
+    </div>
+
+    <!-- WHAT-IF -->
+    <div id="tab-scenario" class="tab-content">
+      <div class="select-row">
+        <label>Feature</label>
+        <select id="scenario-select" onchange="renderScenario()">
+          <option value="">— Select a feature —</option>
+        </select>
+      </div>
+      <div id="whatif-container" style="display:none;">
+        <div class="whatif-grid" id="whatif-cards"></div>
+        <div class="compare-box" id="scenario-compare"></div>
+      </div>
+      <div id="scenario-empty" class="empty-state">
+        <div class="empty-icon">🎯</div>
+        <div class="empty-title">Select a feature above</div>
+        <div class="empty-sub">Simulate WSJF across effort values 1 → 5</div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div id="tab-export" class="tab-content">
+      <div class="export-actions">
+        <button class="btn-export primary" onclick="window.print()">🖨 Print / PDF</button>
+        <button class="btn-export" onclick="copyTableCSV()">📋 Copy CSV</button>
+      </div>
+      <div id="slide-preview">
+        <div class="slide-top">
+          <div>
+            <div class="slide-title">WSJF Priority Board</div>
+            <div class="slide-sub" id="slide-date"></div>
+          </div>
+          <div class="slide-meta" id="slide-meta"></div>
+        </div>
+        <div class="slide-body">
+          <table class="slide-table">
+            <thead>
+              <tr><th>#</th><th>Feature</th><th>BV</th><th>TC</th><th>RR</th><th>E</th><th>WSJF</th><th>CoD</th><th>Confidence</th></tr>
+            </thead>
+            <tbody id="slide-tbody">
+              <tr><td colspan="9" style="color:#d1d5db;text-align:center;padding:32px;font-size:12px;">Add features to populate the slide</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="slide-footer">
+          <span>WSJF=(BV+TC+RR)/E · CoD=BV+TC+RR · Confidence 1(low)→5(high)</span>
+          <span>WSJF Turbo · appvelvet.com</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let features = [];
+  let radarCharts = {};
+  let editingId = null;
+  let currentConf = 3;
+  let isLight = true;
+
+  // ── SIDEBAR TOGGLE (mobile) ──
+  function toggleSidebar() {
+    const sb = document.querySelector('.sidebar');
+    const btn = document.getElementById('sidebar-toggle');
+    const isOpen = sb.classList.toggle('open');
+    btn.textContent = isOpen ? '✕ Close' : '＋ Add feature';
+  }
+
+  // ── THEME TOGGLE ──
+  function toggleTheme() {
+    isLight = !isLight;
+    document.body.classList.toggle('light', isLight);
+    document.getElementById('theme-label').textContent = isLight ? 'Light' : 'Dark';
+    // re-render charts for correct colors
+    if (document.getElementById('tab-radar').classList.contains('active')) renderRadar();
+  }
+
+  // ── SLIDER FILL ──
+  function updateSliderFill(el) {
+    const min=parseFloat(el.min||0), max=parseFloat(el.max||100), val=parseFloat(el.value);
+    const pct=((val-min)/(max-min)*100).toFixed(1);
+    el.style.background=`linear-gradient(to right, var(--accent) ${pct}%, var(--border2) ${pct}%)`;
+  }
+
+  function initSliderFills() {
+    document.querySelectorAll('input[type="range"]').forEach(el => {
+      updateSliderFill(el);
+      el.addEventListener('input', ()=>updateSliderFill(el));
+    });
+  }
+
+  // ── STEP CAPACITY ──
+  function stepCapacity(dir) {
+    const inp = document.getElementById('sprint-capacity');
+    const cur = parseInt(inp.value) || 0;
+    inp.value = Math.max(1, cur + dir);
+    renderRanking();
+  }
+
+  function setConf(v) {
+    currentConf = v;
+    document.querySelectorAll('.conf-star').forEach(s =>
+      s.classList.toggle('active', parseInt(s.dataset.v) <= v));
+  }
+
+  function updateSlider(key, val) {
+    document.getElementById('v-'+key).textContent = val;
+    updateSliderFill(document.getElementById('sl-'+key));
+  }
+
+  function setSlider(key, val) {
+    document.getElementById('sl-'+key).value = val;
+    document.getElementById('v-'+key).textContent = val;
+  }
+
+  // ── EDIT ──
+  function startEdit(id) {
+    const f = features.find(x => x.id === id);
+    if (!f) return;
+    editingId = id;
+    document.getElementById('feat-name').value = f.name;
+    setSlider('bv',f.bv); setSlider('tc',f.tc); setSlider('rr',f.rr); setSlider('ef',f.ef);
+    setConf(f.conf||3);
+    document.getElementById('sidebar-title').textContent = 'Edit feature';
+    document.getElementById('edit-badge').classList.add('show');
+    document.getElementById('btn-add-label').textContent = 'Save changes';
+    document.getElementById('btn-add').classList.add('editing');
+    document.getElementById('btn-cancel').classList.add('show');
+    // Open sidebar on mobile if closed
+    const sb = document.querySelector('.sidebar');
+    const btn = document.getElementById('sidebar-toggle');
+    if (window.innerWidth <= 768 && !sb.classList.contains('open')) {
+      sb.classList.add('open');
+      btn.textContent = '✕ Close';
+      sb.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    document.getElementById('feat-name').focus();
+    renderRanking(); // highlight editing row
+  }
+
+  function cancelEdit() {
+    editingId = null;
+    resetForm();
+    renderRanking();
+  }
+
+  function resetForm() {
+    editingId = null;
+    document.getElementById('feat-name').value = '';
+    setSlider('bv',5); setSlider('tc',5); setSlider('rr',5); setSlider('ef',3);
+    setConf(3);
+    document.getElementById('sidebar-title').textContent = 'New feature';
+    document.getElementById('edit-badge').classList.remove('show');
+    document.getElementById('btn-add-label').textContent = 'Add feature';
+    document.getElementById('btn-add').classList.remove('editing');
+    document.getElementById('btn-cancel').classList.remove('show');
+  }
+
+  // ── ADD / SAVE ──
+  function submitFeature() {
+    const name = document.getElementById('feat-name').value.trim();
+    if (!name) {
+      const inp = document.getElementById('feat-name');
+      inp.style.borderColor = 'var(--red)'; inp.style.boxShadow = '0 0 0 3px var(--red-bg)';
+      setTimeout(() => { inp.style.borderColor=''; inp.style.boxShadow=''; }, 1000);
+      return;
+    }
+    const bv=parseInt(document.getElementById('sl-bv').value);
+    const tc=parseInt(document.getElementById('sl-tc').value);
+    const rr=parseInt(document.getElementById('sl-rr').value);
+    const ef=parseInt(document.getElementById('sl-ef').value);
+    const conf=currentConf;
+    const wsjf=parseFloat(((bv+tc+rr)/ef).toFixed(1));
+    const wwsjf=parseFloat((wsjf*(conf/5)).toFixed(1));
+    const cod=bv+tc+rr;
+    if (editingId) {
+      const idx=features.findIndex(x=>x.id===editingId);
+      if (idx!==-1) features[idx]={...features[idx],name,bv,tc,rr,ef,conf,wsjf,wwsjf,cod};
+      if (radarCharts[editingId]) { radarCharts[editingId].destroy(); delete radarCharts[editingId]; }
+    } else {
+      features.push({id:Date.now(),name,bv,tc,rr,ef,conf,wsjf,wwsjf,cod});
+    }
+    features.sort((a,b)=>b.wsjf-a.wsjf);
+    resetForm();
+    renderAll();
+  }
+
+  function deleteFeature(id) {
+    if (editingId===id) cancelEdit();
+    features=features.filter(f=>f.id!==id);
+    if (radarCharts[id]) { radarCharts[id].destroy(); delete radarCharts[id]; }
+    renderAll();
+  }
+
+  function renderAll() { renderRanking(); renderRadar(); updateSelects(); renderSlide(); }
+
+  function statusTag(wsjf) {
+    if (wsjf>=8) return ['now','Now'];
+    if (wsjf>=5) return ['next','Next sprint'];
+    return ['defer','Defer'];
+  }
+
+  function confPips(conf) {
+    return [1,2,3,4,5].map(i=>`<div class="conf-pip ${i<=(conf||3)?'on':''}"></div>`).join('');
+  }
+
+  // ── CUT BANNER ──
+  function renderCutBanner() {
+    const banner = document.getElementById('cut-banner');
+    const bigOnes = features.filter(f=>f.ef===5);
+    if (!bigOnes.length) { banner.style.display='none'; return; }
+    const f = bigOnes[0];
+    const wouldBe = parseFloat(((f.bv+f.tc+f.rr)/3).toFixed(1));
+    const gain = Math.round(((wouldBe-f.wsjf)/f.wsjf)*100);
+    banner.style.display='flex';
+    banner.innerHTML=`
+      <div class="cut-icon">✂️</div>
+      <div class="cut-text">
+        <div class="cut-title">Cut the feature — "${f.name}" <span class="cut-badge">+${gain}% WSJF</span></div>
+        <div class="cut-sub">Reduce effort 5 → 3 and WSJF goes from <strong>${f.wsjf}</strong> to <strong>${wouldBe}</strong></div>
+      </div>`;
+  }
+
+  // ── RANKING ──
+  function renderRanking() {
+    const list=document.getElementById('ranking-list');
+    const statsBar=document.getElementById('stats-bar');
+    const header=document.getElementById('feat-table-header');
+    const maxScore=features.length?features[0].wsjf:1;
+    renderCutBanner();
+
+    // Sprint capacity
+    const cap = parseInt(document.getElementById('sprint-capacity').value) || 0;
+
+    if (!features.length) {
+      statsBar.style.display='none'; header.style.display='none';
+      document.getElementById('capacity-bar-wrap').style.display='none';
+      list.innerHTML=`<div class="empty-state"><div class="empty-icon">⚡</div><div class="empty-title">No features yet</div><div class="empty-sub">Add your first feature in the sidebar</div></div>`;
+      return;
+    }
+
+    statsBar.style.display='grid'; header.style.display='grid';
+    const avg=(features.reduce((s,f)=>s+f.wsjf,0)/features.length).toFixed(1);
+    const topCod=Math.max(...features.map(f=>f.cod));
+    document.getElementById('stat-count').textContent=features.length;
+    document.getElementById('stat-max').textContent=features[0].wsjf;
+    document.getElementById('stat-avg').textContent=avg;
+    document.getElementById('stat-cod').textContent=topCod;
+    const n=features[0].name;
+    document.getElementById('stat-top').textContent=n.length>11?n.slice(0,11)+'…':n;
+
+    // Capacity bar
+    const capWrap = document.getElementById('capacity-bar-wrap');
+    const capFill  = document.getElementById('capacity-bar-fill');
+    const capPts   = document.getElementById('capacity-bar-pts');
+    const totalEffort = features.reduce((s,f)=>s+f.ef,0);
+
+    if (cap > 0) {
+      capWrap.style.display='flex';
+      const pct = Math.min((totalEffort/cap)*100, 100).toFixed(0);
+      const over = totalEffort > cap;
+      const warn = !over && totalEffort/cap >= 0.85;
+      capFill.style.width = pct+'%';
+      capFill.className = 'capacity-bar-fill' + (over?' over':warn?' warn':'');
+      capPts.innerHTML = over
+        ? `<span class="used">${totalEffort}</span><span class="over-text"> / ${cap} pts (+${totalEffort-cap} over)</span>`
+        : `<span class="used">${totalEffort}</span> / ${cap} pts`;
+      // Update topbar badge
+      const inSprint = features.filter((_,i)=> {
+        let cum=0; for(let j=0;j<=i;j++) cum+=features[j].ef; return cum<=cap;
+      }).length;
+      document.getElementById('sprint-badge').textContent = `${inSprint} in sprint`;
+    } else {
+      capWrap.style.display='none';
+      document.getElementById('sprint-badge').textContent = 'Sprint · Live';
+    }
+
+    // Build rows with cutline
+    let rows = [];
+    let cumEffort = 0;
+    let cutInserted = false;
+
+    features.forEach((f, i) => {
+      const prevCum = cumEffort;
+      cumEffort += f.ef;
+      const pct=(f.wsjf/maxScore*100).toFixed(0);
+      const [tagCls,tagTxt]=statusTag(f.wsjf);
+      const isOut = cap > 0 && prevCum >= cap;
+      const isCutPoint = cap > 0 && !cutInserted && prevCum < cap && cumEffort > cap;
+
+      // Insert cutline before first feature that doesn't fit
+      if (cap > 0 && !cutInserted && prevCum >= cap) {
+        if (rows.length && !cutInserted) {
+          cutInserted = true;
+          rows.push(`<div class="sprint-cutline">
+            <div class="sprint-cutline-bar"></div>
+            <div class="sprint-cutline-label">Sprint cut · ${cap} pts</div>
+            <div class="sprint-cutline-bar"></div>
+          </div>`);
+        }
+      }
+      // Insert cutline mid-feature (feature straddles the boundary — it's the one that pushes over)
+      if (isCutPoint) {
+        cutInserted = true;
+        rows.push(`<div class="sprint-cutline">
+          <div class="sprint-cutline-bar"></div>
+          <div class="sprint-cutline-label">Sprint cut · ${cap} pts</div>
+          <div class="sprint-cutline-bar"></div>
+        </div>`);
+      }
+
+      const rowClass = cap > 0 ? (prevCum >= cap ? ' out-sprint' : '') : '';
+      const shortName = f.name.length > 18 ? f.name.slice(0,18)+'…' : f.name;
+      const wwsjf = f.wwsjf !== undefined ? f.wwsjf : parseFloat((f.wsjf*(f.conf||3)/5).toFixed(1));
+
+      rows.push(`<div class="feat-row${editingId===f.id?' is-editing':''}${rowClass}" id="row-${f.id}">
+        <div class="feat-row-top">
+          <div class="feat-rank">${String(i+1).padStart(2,'0')}</div>
+          <div class="feat-name feat-name-link" data-tooltip="${f.name.length>18?f.name:''}" onclick="startEdit(${f.id})">${shortName}</div>
+          <div class="feat-score-wrap">
+            <div class="feat-score ${i===0?'top':''}">${f.wsjf}</div>
+            <div class="feat-bar"><div class="feat-bar-fill" style="width:${pct}%"></div></div>
+          </div>
+          <div class="feat-wwsjf">${wwsjf}<span class="wwsjf-label">×conf</span></div>
+        </div>
+        <div class="feat-row-scores">
+          <div class="feat-num">${f.bv}</div><div class="feat-num">${f.tc}</div>
+          <div class="feat-num">${f.rr}</div><div class="feat-num">${f.ef}</div>
+          <div class="feat-cod">${f.cod}</div>
+          <div class="feat-conf">${confPips(f.conf)}</div>
+        </div>
+        <div class="feat-row-bottom">
+          <span class="feat-tag ${tagCls} mob-tag">${tagTxt}</span>
+          <div class="row-actions">
+            <button class="btn-edit" onclick="startEdit(${f.id})" title="Edit">✎</button>
+            <button class="btn-del" onclick="deleteFeature(${f.id})" title="Delete">✕</button>
+          </div>
+        </div>
+      </div>`);
+    });
+
+    list.innerHTML = rows.join('');
+  }
+
+  // ── RADAR ──
+  function renderRadar() {
+    const grid=document.getElementById('radar-grid');
+    const empty=document.getElementById('radar-empty');
+    const spinner=document.getElementById('radar-spinner');
+    if (!features.length) {
+      grid.style.display='none'; spinner.style.display='none'; empty.style.display='flex';
+      Object.values(radarCharts).forEach(c=>c.destroy()); radarCharts={}; grid.innerHTML='';
+      return;
+    }
+    // Show spinner first
+    grid.style.display='none'; empty.style.display='none'; spinner.style.display='grid';
+    Object.values(radarCharts).forEach(c=>c.destroy()); radarCharts={};
+
+    setTimeout(()=>{
+      spinner.style.display='none'; grid.style.display='grid';
+      const gridColor = isLight ? '#e4e1ee' : '#1e1c24';
+      const labelColor = isLight ? '#a09eb8' : '#4a4760';
+      grid.innerHTML=features.map(f=>`
+        <div class="radar-card">
+          <div class="radar-card-name">${f.name}</div>
+          <div class="radar-card-score">WSJF ${f.wsjf} · W.WSJF ${f.wwsjf||parseFloat((f.wsjf*(f.conf||3)/5).toFixed(1))} · CoD ${f.cod}</div>
+          <div class="radar-canvas-wrap"><canvas id="rc-${f.id}"></canvas></div>
+        </div>`).join('');
+      features.forEach(f=>{
+        radarCharts[f.id]=new Chart(document.getElementById('rc-'+f.id).getContext('2d'),{
+          type:'radar',
+          data:{labels:['Biz Value','Time Crit.','Risk Red.','Effort (inv)','Confidence'],
+            datasets:[{data:[f.bv,f.tc,f.rr,10-(f.ef-1)*2,(f.conf||3)*2],
+              borderColor:'#f02d7d',backgroundColor:'rgba(240,45,125,0.18)',
+              borderWidth:1.5,pointBackgroundColor:'#f02d7d',pointRadius:3}]},
+          options:{responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{display:false}},
+            scales:{r:{min:0,max:10,ticks:{display:false},grid:{color:gridColor},
+              pointLabels:{color:labelColor,font:{family:'Inter',size:9}}}}}
+        });
+      });
+    }, 120);
+  }
+
+  // ── SELECTS ──
+  function updateSelects() {
+    const s1=document.getElementById('scenario-select');
+    const c1=s1.value;
+    s1.innerHTML='<option value="">— Select a feature —</option>'+features.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+    if(c1)s1.value=c1;
+    renderScenario();
+  }
+
+  // ── SCENARIO ──
+  function renderScenario() {
+    const id=parseInt(document.getElementById('scenario-select').value);
+    const cont=document.getElementById('whatif-container');
+    const empty=document.getElementById('scenario-empty');
+    if(!id){cont.style.display='none';empty.style.display='flex';return;}
+    const f=features.find(x=>x.id===id); if(!f)return;
+    cont.style.display='contents'; empty.style.display='none';
+    const maxS=(f.bv+f.tc+f.rr)/1;
+    document.getElementById('whatif-cards').innerHTML=[1,2,3,4,5].map(e=>{
+      const s=((f.bv+f.tc+f.rr)/e).toFixed(1);
+      const diff=(parseFloat(s)-f.wsjf).toFixed(1);
+      const isCur=e===f.ef;
+      const dc=isCur?'same':diff>0?'up':'down';
+      const dt=isCur?'current':(diff>0?'▲ +'+diff:'▼ '+diff);
+      return `<div class="whatif-card ${isCur?'current':''}">
+        <div class="whatif-effort">Effort = ${e}</div>
+        <div class="whatif-score">${s}</div>
+        <div class="whatif-delta ${dc}">${dt}</div>
+      </div>`;
+    }).join('');
+    const bars=[1,2,3,4,5].map(e=>{
+      const s=(f.bv+f.tc+f.rr)/e;
+      const pct=(s/maxS*100).toFixed(0);
+      const isCur=e===f.ef;
+      return `<div class="cbar-row">
+        <div class="cbar-label">Effort ${e}${isCur?' ← now':''}</div>
+        <div class="cbar-track"><div class="cbar-fill ${isCur?'':'alt'}" style="width:${pct}%"></div></div>
+        <div class="cbar-val ${isCur?'':'alt'}">${s.toFixed(1)}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('scenario-compare').innerHTML=
+      `<div class="compare-box-title">WSJF vs Effort — ${f.name}</div>${bars}`;
+  }
+
+  // ── EXPORT ──
+  function renderSlide() {
+    document.getElementById('slide-date').textContent=
+      new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+    document.getElementById('slide-meta').textContent=
+      `${features.length} feature${features.length!==1?'s':''} · Sorted by WSJF`;
+    const tbody=document.getElementById('slide-tbody');
+    if(!features.length){
+      tbody.innerHTML=`<tr><td colspan="9" style="color:#d1d5db;text-align:center;padding:32px;font-size:12px;">Add features to populate the slide</td></tr>`;
+      return;
+    }
+    tbody.innerHTML=features.map((f,i)=>`<tr>
+      <td><strong style="font-family:var(--mono)">#${i+1}</strong></td>
+      <td><strong>${f.name}</strong></td>
+      <td style="font-family:var(--mono);color:#6b7280">${f.bv}</td>
+      <td style="font-family:var(--mono);color:#6b7280">${f.tc}</td>
+      <td style="font-family:var(--mono);color:#6b7280">${f.rr}</td>
+      <td style="font-family:var(--mono);color:#6b7280">${f.ef}</td>
+      <td>${i===0?`<span class="slide-badge">${f.wsjf}</span>`:`<strong style="font-family:var(--mono)">${f.wsjf}</strong>`}</td>
+      <td style="font-family:var(--mono);color:#f59e0b;font-weight:600">${f.cod}</td>
+      <td style="font-family:var(--mono);color:#9ca3af">${'★'.repeat(f.conf||3)}${'☆'.repeat(5-(f.conf||3))}</td>
+    </tr>`).join('');
+  }
+
+  function copyTableCSV() {
+    if(!features.length)return;
+    const csv=['Rank,Feature,BV,TC,RR,Effort,WSJF,CoD,Confidence',
+      ...features.map((f,i)=>`${i+1},"${f.name}",${f.bv},${f.tc},${f.rr},${f.ef},${f.wsjf},${f.cod},${f.conf||3}`)
+    ].join('\n');
+    navigator.clipboard.writeText(csv).then(()=>{
+      const btn=event.target,o=btn.textContent;
+      btn.textContent='✓ Copied!'; setTimeout(()=>btn.textContent=o,2000);
+    });
+  }
+
+  function switchTab(tab,el) {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+  }
+
+  // ── DEMO ──
+  features=[
+    {id:1,name:'SSO / OAuth Login',  bv:9,tc:8,rr:7,ef:3,conf:4,wsjf:8.0, wwsjf:6.4, cod:24},
+    {id:2,name:'Mobile App',         bv:8,tc:6,rr:5,ef:5,conf:2,wsjf:3.8, wwsjf:1.5, cod:19},
+    {id:3,name:'Real-time Notifs',   bv:7,tc:9,rr:4,ef:2,conf:5,wsjf:10.0,wwsjf:10.0,cod:20},
+    {id:4,name:'Export PDF',         bv:6,tc:5,rr:3,ef:1,conf:5,wsjf:14.0,wwsjf:14.0,cod:14},
+    {id:5,name:'Advanced Analytics', bv:8,tc:4,rr:6,ef:4,conf:3,wsjf:4.5, wwsjf:2.7, cod:18},
+  ].sort((a,b)=>b.wsjf-a.wsjf);
+
+  document.getElementById('slide-date').textContent=
+    new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  // Init light mode default
+  document.body.classList.add('light');
+  document.getElementById('theme-label').textContent = 'Light';
+  renderAll();
+  initSliderFills();
+</script>
+
+<div class="app-footer">
+  Made with 🩷 by <a href="https://www.linkedin.com/in/olivier-de-locht/" target="_blank">ol_dl</a>
+</div>
+
+</body>
+</html>

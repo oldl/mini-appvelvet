@@ -1,0 +1,5 @@
+[functions]
+  included_files = ["netlify/functions/**"]
+
+[functions."claude-fix"]
+  timeout = 30

@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stack of Stack v2 · 2026</title>
+  <meta name="description" content="A curated list of the best curated lists for makers, designers, developers, PMs & AI builders. Updated 2026.">
+  <!-- SEO -->
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://stackofstack.app/">
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!-- Standard favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<!-- SVG (scalable, premium) -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<!-- Apple -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<!-- Manifest (optional PWA) -->
+<link rel="manifest" href="/site.webmanifest">
+
+
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Stack of Stack — The Best Curated Lists for Builders">
+<meta property="og:description" content="A curated list of the best curated lists for makers, designers, developers, PMs & AI builders. Updated 2026.">
+<meta property="og:url" content="https://stackofstack.app/">
+<meta property="og:site_name" content="Stack of Stack">
+<meta property="og:image" content="https://stackofstack.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Stack of Stack — The Best Curated Lists">
+<meta name="twitter:description" content="The ultimate meta-directory of AI tools, startup stacks, design libraries & builder ecosystems.">
+<meta name="twitter:image" content="https://stackofstack.app/og.png">
+<meta name="twitter:creator" content="@ol_dl">
+
+<!-- Theme -->
+<meta name="theme-color" content="#ffffff">
+
+<meta name="author" content="Olivier de Locht">
+<meta name="keywords" content="AI tools, curated lists, startup resources, design systems, builder tools, product management resources">
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f8f8;
+      --border: #e0e0e0;
+      --accent: #ff5a1f;
+      --accent-dim: rgba(255,90,31,0.08);
+      --text: #1a1a1a;
+      --muted: #888;
+      --dead: #cc2222;
+      --dead-dim: rgba(204,34,34,0.07);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* HEADER */
+    header{
+  border-bottom: 1px solid var(--border);
+  padding: 28px 40px 0;              /* 0 en bas, car la barre sticky gère son padding */
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+.header-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.tagline {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  letter-spacing: 0.3px;
+}
+
+.header-center .search-wrap {
+  width: 100%;
+  max-width: 420px;
+}
+.brand-logo {
+  display: flex;
+  flex-direction: column;
+}
+.brand-logo img {
+  height: 62px;
+  width: auto;
+  display: block;
+}
+
+.search-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-center .search-wrap {
+  max-width: 420px;
+  width: 100%;
+}
+
+.search-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-center .search-wrap {
+  max-width: 420px;
+  width: 100%;
+}
+
+    .brand p {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-credit {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-credit a {
+  text-decoration: none;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.header-credit a:hover {
+  color: var(--accent);
+}
+
+.header-credit span {
+  opacity: 0.4;
+}
+    .count-badge {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 28px;
+      color: var(--accent);
+      line-height: 1;
+      text-align: right;
+    }
+
+    .count-badge small {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      color: var(--muted);
+      display: block;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* SEARCH + CONTROLS */
+   .controls{
+  position: sticky;
+  top: 0;
+  z-index: 120;
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 40px;
+}
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 280px;
+    }
+
+    .search-wrap input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 14px 9px 38px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  outline: none;
+  border-radius: 28px; /* ← arrondi */
+  transition: all 0.2s ease;
+}
+
+    .search-wrap input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+    .search-wrap input::placeholder { color: #bbb; }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #bbb;
+    }
+
+    /* FILTERS */
+    .filters {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-pill {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      padding: 4px 11px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 20px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .filter-pill:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+    .filter-pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .filter-pill .pill-count {
+      font-size: 10px;
+      opacity: 0.65;
+      margin-left: 3px;
+    }
+
+    /* AIRTABLE CONFIG */
+    .airtable-bar {
+      background: #fafafa;
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 0;
+      overflow: hidden;
+      transition: height 0.3s;
+    }
+
+    .airtable-bar.open { height: 52px; }
+
+    .airtable-bar input {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      outline: none;
+      width: 220px;
+      border-radius: 2px;
+    }
+
+    .airtable-bar input:focus { border-color: var(--accent); }
+
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      padding: 6px 14px;
+      border: 1px solid;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover { opacity: 0.85; }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--muted);
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* MAIN GRID */
+    main {
+      padding: 24px 20px 80px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .category-section {
+      margin-bottom: 48px;
+    }
+
+    .category-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .category-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .category-title .cat-count {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    /* LIST VIEW */
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    /* CARD = LIST ITEM */
+    .card {
+      background: #fff;
+      border: 1px solid transparent;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      transition: all 0.15s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+      padding: 10px 12px;
+      border-radius: 6px;
+    }
+
+    .card:hover {
+      background: #f9f9f9;
+      border-color: var(--border);
+      border-bottom-color: var(--border);
+    }
+
+    .card.archived { opacity: 0.38; }
+    .card.archived:hover { opacity: 0.55; }
+    .card.stale { opacity: 0.72; }
+
+    /* FAVICON SQUARE */
+    .card-favicon {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      border-radius: 8px;
+      background: #f2f2f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+
+    .card-favicon img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+
+    .card-favicon .favicon-letter {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* TEXT */
+    .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .card-top {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .card-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .card-url {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: #777;
+      line-height: 1.45;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .badge-year {
+      font-size: 10px;
+      font-weight: 500;
+      color: #aaa;
+      background: #f5f5f5;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+      padding: 0 5px;
+      line-height: 18px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-size {
+      font-size: 10px;
+      font-weight: 500;
+      color: #888;
+      background: #f5f5f5;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+      padding: 0 5px;
+      line-height: 18px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-archived {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #fff0f0;
+      border: 1px solid #ffb3b3;
+      color: var(--dead);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge-stale {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #fff8ed;
+      border: 1px solid #ffd08a;
+      color: #b06000;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 80px 40px;
+      color: var(--muted);
+    }
+
+    .empty-state .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 24px;
+      color: #ccc;
+      margin-bottom: 8px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+ 
+
+    footer p { color: var(--muted); font-size: 12px; }
+    footer a { color: var(--accent); text-decoration: none; }
+
+.submit-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  padding: 8px 20px;
+  border-radius: 999px;   /* ← full rounded */
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.submit-link:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+    /* AIRTABLE CONFIG TOGGLE */
+    .airtable-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s;
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .airtable-toggle:hover { color: var(--accent); }
+    .airtable-toggle svg { width: 14px; height: 14px; }
+
+    /* LOADING */
+    .loading-spinner {
+      display: inline-block;
+      width: 13px;
+      height: 13px;
+      border: 2px solid #eee;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      header { padding: 16px 20px 14px; }
+      main { padding: 16px 12px 60px; }
+      footer { padding: 16px 20px; }
+      .airtable-bar { padding: 0 20px; }
+      .brand-logo img { height: 38px; }
+    }
+
+    /* HIDDEN */
+    .hidden { display: none !important; }
+
+    /* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #fff;
+  width: 420px;
+  max-width: 90%;
+  border-radius: 6px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.modal-header h3 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.modal-close:hover { color: var(--accent); }
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-body input,
+.modal-body textarea {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.modal-body input:focus,
+.modal-body textarea:focus {
+  border-color: var(--accent);
+}
+
+.modal-body textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.brand {
+  margin-top: 6px;
+}
+
+.brand p {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+.submit-header {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-header:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.header-actions{
+  display:flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* submit appears on scroll */
+.submit-hidden{
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: all .25s ease;
+}
+.submit-show{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top{
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 999;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .2s ease;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.back-to-top:hover{
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.back-hidden{
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.back-show{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+  </style>
+</head>
+<body>
+
+<header>
+<div class="header-top">
+
+  <!-- LEFT: LOGO -->
+ <a class="brand-logo" href="#" onclick="setFilter('all'); return false;">
+  <img src="img/logo.png" alt="Stack of Stack">
+</a>
+
+  <!-- CENTER: TAGLINE + SEARCH -->
+  <div class="header-center">
+    <p class="tagline">A curated list of the best curated lists 🫠</p>
+
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" id="search-input" placeholder="Search stacks..." oninput="filterCards()">
+    </div>
+  </div>
+
+  <!-- RIGHT: COUNT -->
+<div class="header-actions">
+
+  <div class="header-credit">
+    <a href="https://www.linkedin.com/in/olivier-de-locht/" target="_blank" rel="noopener">
+      With 🩷 by @ol_dl 
+    </a>
+  </div>
+
+<button class="submit-header" id="submit-scroll" onclick="openSubmitModal()">
+  + Submit a stack
+</button>
+
+</div>
+
+</div>
+</header>
+
+<!-- STICKY FILTER BAR (outside header) -->
+<div class="controls" id="sticky-controls">
+  <div class="filters" id="filter-pills">
+    <!-- generated by JS -->
+  </div>
+</div>
+
+<!-- AIRTABLE CONFIG BAR -->
+<div class="airtable-bar" id="airtable-bar">
+  <input type="text" id="at-token" placeholder="Airtable Personal Access Token" style="width:260px">
+  <input type="text" id="at-base" placeholder="Base ID (appXXXXXXX)">
+  <input type="text" id="at-table" placeholder="Table name" value="Stacks">
+  <button class="btn btn-primary" onclick="loadFromAirtable()">
+    <span id="at-btn-text">Load</span>
+    <span id="at-spinner" class="loading-spinner hidden"></span>
+  </button>
+  <span id="at-status" style="font-size:11px;color:var(--muted)"></span>
+  <span style="flex:1"></span>
+  <span style="font-size:11px;color:var(--muted);max-width:280px">
+    Expected fields: <strong style="color:#fff">Name</strong>, <strong style="color:#fff">URL</strong>, <strong style="color:#fff">Category</strong>, <strong style="color:#fff">Status</strong> (alive/dead), <strong style="color:#fff">Thumbnail</strong> (optional)
+  </span>
+</div>
+
+<main id="main-content">
+  <!-- Generated by JS -->
+</main>
+
+<div class="empty-state hidden" id="empty-state">
+  <div class="empty-icon">⚡</div>
+  <h3>No stacks found</h3>
+  <p>Try adjusting your search or filters.</p>
+</div>
+
+<footer>
+  <button class="submit-link submit-center" onclick="openSubmitModal()">
+    + Submit a Stack
+  </button>
+</footer>
+
+<script>
+
+const STACKS = [
+
+  // ── 🤖 AI — directories of AI tools ──────
+  { name: "There's An AI For That",  url: "https://theresanaiforthat.com/",             cat: "AI",        status: "active", year: 2022, size: "5000+ tools", desc: "The most comprehensive database of AIs available — searchable by task, category and use case." },
+  { name: "FutureTools",             url: "https://www.futuretools.io/",                cat: "AI",        status: "active", year: 2023, size: "1000+ tools", desc: "Collects and organizes all the best AI tools so you too can become superhuman." },
+  { name: "Futurepedia",             url: "https://www.futurepedia.io/",                cat: "AI",        status: "active", year: 2022, size: "2000+ tools", desc: "Find the best AI tools and software by category, updated daily with pros/cons and ratings." },
+  { name: "Aixploria",               url: "https://www.aixploria.com/en/",              cat: "AI",        status: "active", year: 2023, size: "3000+ tools", desc: "Ranked daily list of the best artificial intelligence tools available — top 10 by category." },
+  { name: "Altern.ai",               url: "https://altern.ai/",                         cat: "AI",        status: "active", year: 2023, size: "1500+ tools", desc: "Search and discover AI tools with detailed filtering, alternatives and community reviews." },
+  { name: "Toolify.ai",              url: "https://www.toolify.ai/",                    cat: "AI",        status: "active", year: 2023, size: "10k+ tools", desc: "AI tools directory ranked by web traffic, with revenue estimates and monthly trends." },
+  { name: "OpenTools",               url: "https://opentools.ai/",                      cat: "AI",        status: "active", year: 2023, size: "800+ tools", desc: "AI-powered search to find the exact right AI tool for any task or use case." },
+  { name: "Easy With AI",            url: "https://easywithai.com/",                    cat: "AI",        status: "active", year: 2023, size: "2000+ tools", desc: "One of the largest collections of AI tools and resources on the internet, organised by category." },
+  { name: "AI Top Tools",            url: "https://aitoptools.com/",                    cat: "AI",        status: "active", year: 2023, size: "1000+ tools", desc: "Best AI tools directory — browse by category, use case, pricing and user ratings." },
+  { name: "Awesome ChatGPT Prompts", url: "https://github.com/f/awesome-chatgpt-prompts", cat: "AI",     status: "stale", year: 2022, size: "200+ prompts", desc: "Curated list of ChatGPT prompt examples — 110k+ GitHub stars, community-maintained." },
+  { name: "Awesome AI Agents",       url: "https://github.com/e2b-dev/awesome-ai-agents", cat: "AI",     status: "active", year: 2023, size: "150+ agents", desc: "Curated list of AI autonomous agents — frameworks, platforms and notable projects by e2b." },
+  { name: "Awesome LLM",             url: "https://github.com/Hannibal046/Awesome-LLM",  cat: "AI",     status: "active", year: 2023, size: "500+ resources", desc: "Curated list of large language model papers, frameworks, tools and learning resources on GitHub." },
+  { name: "AI Canon",                url: "https://a16z.com/ai-canon/",                 cat: "AI",        status: "active", year: 2023, size: "~50 picks", desc: "Curated reading list of essential AI/ML resources by Andreessen Horowitz — papers, courses, blogs." },
+  { name: "AI Directories List",     url: "https://github.com/best-of-ai/ai-directories", cat: "AI",    status: "active", year: 2023, size: "100+ dirs", desc: "Awesome list of the best AI tool directories to submit your project and discover new tools." },
+  { name: "AI Tools Master List",    url: "https://docs.google.com/document/d/1tD4WQsbR4d_gPqPLstL1P4dNFYGttfW-Jk3g-lpdOeE/edit", cat: "AI", status: "active", year: 2023, size: "500+ tools", desc: "Large curated Google Doc listing hundreds of AI tools across categories, widely shared in the builder and AI community." },
+  { name: "Insidr.ai AI Tools List", url: "https://www.insidr.ai/ai-tools/", cat: "AI", status: "active", year: 2023, size: "2000+ tools", desc: "Large curated list of AI tools across categories including writing, coding, marketing and productivity." },
+  { name: "AI Tools Directory", url: "https://aitoolsdirectory.com/", cat: "AI", status: "active", year: 2023, size: "1000+ tools", desc: "Directory of AI tools and products organized by category and updated regularly." },
+  { name: "AI Tools Club", url: "https://aitoolsclub.com/", cat: "AI", status: "active", year: 2023, size: "3000+ tools", desc: "Curated AI tools database with categories for developers, creators, productivity and marketing." },
+  { name: "Supertools AI", url: "https://supertools.therundown.ai/", cat: "AI", status: "active", year: 2023, size: "2000+ tools", desc: "Curated list of AI tools featured in The Rundown AI newsletter." },
+  { name: "TopAI.tools", url: "https://topai.tools/", cat: "AI", status: "active", year: 2023, size: "1500+ tools", desc: "AI tools directory with trending rankings, categories and tool comparisons." },
+  { name: "Papers With Code", url: "https://paperswithcode.com/", cat: "AI", status: "active", year: 2019, size: "100k+ papers", desc: "Machine learning papers with associated code repositories, benchmarks and datasets." },
+  { name: "Awesome Generative AI", url: "https://github.com/steven2358/awesome-generative-ai", cat: "AI", status: "active", year: 2023, size: "200+ resources", desc: "Curated list of generative AI models, frameworks, tools and resources." },
+  { name: "Machine Learning Systems Design", url: "https://github.com/chiphuyen/machine-learning-systems-design", cat: "AI", status: "active", year: 2023, size: "100+ resources", desc: "Collection of machine learning system design resources and learning materials." },
+  { name: "MAD Landscape", url: "https://mattturck.com/data2023/", cat: "AI", status: "active", year: 2023, size: "1000+ companies", desc: "Famous annual landscape of the AI and data ecosystem curated by Matt Turck." },
+  { name: "CB Insights AI Landscape", url: "https://www.cbinsights.com/research/report/artificial-intelligence-startup-landscape/", cat: "AI", status: "active", year: 2023, size: "300+ startups", desc: "Landscape map of the artificial intelligence startup ecosystem and major categories." }, 
+  { name: "AI Agents Directory", url: "https://aiagentsdirectory.com/", cat: "AI", status: "active", year: 2024, size: "200+ agents", desc: "Directory focused on autonomous AI agents, agent frameworks and tools for building agentic workflows." },
+  { name: "AI Valley Tools", url: "https://www.aivalley.ai/", cat: "AI", status: "active", year: 2023, size: "1000+ tools", desc: "Curated AI tools collection with categories for builders, creators and startups." },
+  { name: "Future Tools AI Database", url: "https://futuretools.io/", cat: "AI", status: "active", year: 2023, size: "1000+ tools", desc: "Popular curated AI tools list originally curated by Matt Wolfe, organized by use case." },
+  { name: "AI Tool Hunt", url: "https://aitoolhunt.com/", cat: "AI", status: "active", year: 2023, size: "800+ tools", desc: "Directory of AI tools with categories, new launches and curated recommendations." },
+  { name: "AI Tool Guru", url: "https://aitoolguru.com/", cat: "AI", status: "active", year: 2023, size: "700+ tools", desc: "AI tools discovery platform focused on productivity, automation and creator tools." },
+  { name: "AI Scout", url: "https://aiscout.net/", cat: "AI", status: "active", year: 2023, size: "1000+ tools", desc: "Discover trending AI tools, startups and projects with curated collections." },
+  { name: "AI Library", url: "https://ailibrary.io/", cat: "AI", status: "active", year: 2023, size: "1000+ tools", desc: "Large AI tools library organized by use case, category and pricing model." },
+  { name: "There's An AI For That Landscape", url: "https://theresanaiforthat.com/landscape/", cat: "AI", status: "active", year: 2024, size: "visual map", desc: "Visual landscape map of AI tools across categories built from the TAAFT database." },
+  { name: "Generative AI Landscape", url: "https://www.generativeailandscape.com/", cat: "AI", status: "active", year: 2024, size: "300+ tools", desc: "Interactive landscape of generative AI startups and tools across the ecosystem." },
+  { name: "AI Collection", url: "https://www.aicollection.com/", cat: "AI", status: "active", year: 2023, size: "2000+ tools", desc: "One of the largest AI tool collections curated for creators, marketers and developers." },
+  
+  // ── 📊 AI CHARTS — market maps & data visuals ─────
+{ name: "Stanford AI Index", url: "https://aiindex.stanford.edu/report/", cat: "AICharts", status: "active", year: 2017, size: "Annual report", desc: "AI Index report with rich charts on adoption, compute, publications and global trends." },
+{ name: "State of AI Report", url: "https://www.stateof.ai/", cat: "AICharts", status: "active", year: 2018, size: "Slide report", desc: "Annual slide deck packed with AI industry charts (VC, models, compute, macro trends)." },
+{ name: "CB Insights (AI Research)", url: "https://www.cbinsights.com/research/", cat: "AICharts", status: "active", year: 2008, size: "Market maps", desc: "AI market maps and funding visuals frequently shared on LinkedIn." },
+{ name: "Dealroom Insights", url: "https://dealroom.co/blog", cat: "AICharts", status: "active", year: 2013, size: "Ecosystem charts", desc: "Data-driven ecosystem maps and funding charts for startups (incl. AI/GenAI)." },
+{ name: "Visual Capitalist (AI)", url: "https://www.visualcapitalist.com/", cat: "AICharts", status: "active", year: 2011, size: "Infographics", desc: "Highly shareable AI infographics (markets, adoption, investment, macro views)." },
+
+// ── 🧠 AI WORKFLOW LIBRARIES ─────
+{ name: "FlowGPT", url: "https://flowgpt.com/", cat: "AIWorkflows", status: "active", year: 2023, size: "Prompt library", desc: "Community-driven library of prompts and AI workflows." },
+{ name: "PromptSea", url: "https://promptsea.io/", cat: "AIWorkflows", status: "active", year: 2022, size: "Prompt marketplace", desc: "Marketplace for buying and discovering AI prompts." },
+{ name: "There’s An AI For That (Use cases)", url: "https://theresanaiforthat.com/", cat: "AIWorkflows", status: "active", year: 2022, size: "Use-case database", desc: "Use-case oriented AI tool discovery and workflows." },
+{ name: "Futurepedia", url: "https://www.futurepedia.io/", cat: "AIWorkflows", status: "active", year: 2022, size: "AI tools library", desc: "Categorized AI tools and workflows across industries." },
+
+// ── ⚙️ BUILDER OS ─────
+{ name: "Indie Hackers", url: "https://www.indiehackers.com/", cat: "BuilderOS", status: "active", year: 2016, size: "Founder community", desc: "Stacks, tools and workflows shared by indie founders." },
+{ name: "Starter Story", url: "https://www.starterstory.com/", cat: "BuilderOS", status: "active", year: 2017, size: "Founder interviews", desc: "Real tool stacks and monetization breakdowns from founders." },
+{ name: "Open Startup List", url: "https://openstartup.dev/", cat: "BuilderOS", status: "active", year: 2020, size: "Public revenue data", desc: "Open startups sharing revenue, metrics and tech stack." },
+{ name: "Makerpad", url: "https://www.makerpad.co/", cat: "BuilderOS", status: "active", year: 2019, size: "No-code workflows", desc: "No-code workflows and automation systems for builders." },
+
+// ── 🎨 DESIGN SYSTEMS ─────
+{ name: "Mobbin", url: "https://mobbin.com/", cat: "DesignSystems", status: "active", year: 2018, size: "UI library", desc: "Large mobile & web UI pattern library." },
+{ name: "Pageflows", url: "https://pageflows.com/", cat: "DesignSystems", status: "active", year: 2016, size: "UX flows", desc: "User flow and UX interaction database." },
+{ name: "Design Systems Repo", url: "https://designsystemsrepo.com/", cat: "DesignSystems", status: "active", year: 2017, size: "Design systems list", desc: "Collection of public design systems." },
+{ name: "UI8", url: "https://ui8.net/", cat: "DesignSystems", status: "active", year: 2013, size: "UI assets", desc: "Premium UI kits and component systems." },
+
+// ── 🧑‍💼 PRODUCT PEOPLE ─────
+{ name: "Product Hunt Collections", url: "https://www.producthunt.com/topics/productivity", cat: "ProductTools", status: "active", year: 2013, size: "Curated tools", desc: "Curated collections of tools for builders and PMs." },
+{ name: "Mind the Product", url: "https://www.mindtheproduct.com/", cat: "ProductTools", status: "active", year: 2010, size: "Product resources", desc: "Product management insights and frameworks." },
+{ name: "Product Coalition", url: "https://productcoalition.com/", cat: "ProductTools", status: "active", year: 2018, size: "PM articles", desc: "Large collection of product thinking articles." },
+{ name: "Refactoring UX", url: "https://refactoringui.com/", cat: "ProductTools", status: "active", year: 2018, size: "UI principles", desc: "Practical UI and product design guidance." },
+
+  // ── 🚀 STARTUPS ───────────────────────────
+  { name: "StartupStash",            url: "https://startupstash.com/",                  cat: "Startups", status: "active", year: 2015, size: "400+ tools", desc: "Curated resources and tools for startups — 400+ categories from funding to growth to design." },
+  { name: "Failory",                 url: "https://failory.com/entrepreneurial-lists",  cat: "Startups", status: "active", year: 2017, size: "300+ interviews", desc: "Curated lists of startup resources — post-mortems, interviews and tools for entrepreneurs." },
+  { name: "Startup Toolkit",         url: "https://startuptoolkit.info/",               cat: "Startups", status: "active", year: 2016, size: "200+ tools", desc: "Curated list of the best tools and resources for founders at every stage of their journey." },
+  { name: "Startup Resources",       url: "https://startupresources.io/",               cat: "Startups", status: "active", year: 2016, size: "300+ links", desc: "Hand-curated library of the best startup resources — vetted by founders for founders." },
+  { name: "Steve Blank Tools",       url: "https://steveblank.com/tools-and-blogs-for-entrepreneurs/", cat: "Startups", status: "active", year: 2010, size: "100+ links", desc: "Steve Blank's personal curated list of essential tools, blogs and resources for entrepreneurs." },
+  { name: "Do Things That Don't Scale", url: "https://dothingsthatdontscale.com/",     cat: "Startups", status: "active", year: 2015, size: "50+ stories", desc: "Collection of stories about how famous startups got their first users by doing unscalable things." },
+  { name: "Awesome Indie",           url: "https://github.com/mezod/awesome-indie",     cat: "Startups", status: "stale", year: 2017, size: "200+ resources", desc: "Curated resources for independent developers to make money — bootstrapping, SaaS, side projects." },
+  { name: "Dataviz Tools",           url: "http://dataviz.tools/",                      cat: "Startups", status: "stale", year: 2015, size: "150+ tools", desc: "Curated guide to the best tools, resources and tutorials for data visualisation practitioners." },
+  { name: "Starter Story",           url: "https://www.starterstory.com/",              cat: "Startups", status: "active", year: 2017, size: "4000+ stories", desc: "Collection of 4000+ founder interviews with revenue, growth tactics and business breakdowns." },
+  { name: "YC Startup Library",      url: "https://www.ycombinator.com/library",        cat: "Startups", status: "active", year: 2012, size: "500+ essays", desc: "Y Combinator's curated library of essays, videos and resources on building startups." },
+  { name: "Startup Collections",     url: "http://startupcollections.com/",             cat: "Startups", status: "archived",  desc: "Curated lists of startup resources, tools and links organised by category." },
+  { name: "Collapsed.co",            url: "https://collapsed.co/",                      cat: "Startups", status: "archived",  desc: "Database of startup failures with post-mortems, reasons and lessons learned." },
+  { name: "Startup Rocket",          url: "https://www.startuprocket.com/framework",    cat: "Startups", status: "archived",  desc: "Framework and curated resources to help founders build, launch and grow their startups." },
+  { name: "Crowdstack",              url: "http://crowdstack.me/",                       cat: "Startups", status: "archived",  desc: "Curated collection of crowdfunding resources, platforms and tools for founders and creators." },
+  { name: "InvestorList",            url: "https://investorlist.co/",                   cat: "Startups", status: "archived",  desc: "Curated directory of angel investors and VCs with contact info and investment focus." },
+  { name: "Spreadshare",             url: "https://spreadshare.co/",                    cat: "Startups", status: "archived",  desc: "Community for discovering and sharing curated spreadsheets and databases across topics." },
+  { name: "Stacklist",               url: "http://www.stacklist.com/",                  cat: "Startups", status: "archived",  desc: "Discover the tech stack behind your favorite companies — tools, frameworks and services used." },
+  { name: "Creator Economy Tools", url: "https://www.creatoreconomytools.com/", cat: "Startups", status: "active", year: 2021, size: "300+ tools", desc: "Curated directory of tools for creators — monetization, newsletters, video, community and growth stack." },
+  { name: "NoCode Founders", url: "https://nocodefounders.com/", cat: "NoCode", status: "active", year: 2020, size: "Community + resources", desc: "Community-driven platform for no-code founders sharing tools, playbooks and startup resources." },
+  { name: "StartupList.pro", url: "https://startuplist.pro/", cat: "Startups", status: "active", year: 2022, size: "Curated startup directories", desc: "Collection of curated startup directories and places to submit your product for visibility." },
+  { name: "FounderKit", url: "https://founderkit.com/", cat: "Startups", status: "active", year: 2023, size: "Founder resources", desc: "Curated toolkit for founders — tools, templates, directories and launch resources." },
+
+  // ── 🎨 DESIGN — resource lists ────────────
+  { name: "Awesome Design",          url: "https://github.com/gztchan/awesome-design",  cat: "Design",   status: "stale", year: 2015, size: "300+ links", desc: "Curated design resources from all over the world — tools, books, blogs, colour and typography." },
+  { name: "Resource Cards",          url: "https://resourcecards.com/",                 cat: "Design",   status: "active", year: 2015, size: "400+ resources", desc: "Carefully selected free resources for designers — fonts, icons, UI kits, photos and more." },
+  { name: "All The Free Stock",      url: "http://allthefreestock.com/",                cat: "Design",   status: "active", year: 2015, size: "100+ sites", desc: "All the free stock images, videos, music and icons in one place — curated list." },
+  { name: "Facebook Design",         url: "https://facebook.design/",                   cat: "Design",   status: "active", year: 2016, size: "30+ resources", desc: "Resources and tools for designers from Meta — fonts, design system files and open-source work." },
+  { name: "UX Project Checklist",    url: "http://uxchecklist.github.io/",              cat: "Design",   status: "stale", year: 2015, size: "50+ items", desc: "UX project checklist to use at the start of each design project — 50+ items to cover." },
+  { name: "UI Sources",              url: "https://www.uisources.com/",                 cat: "Design",   status: "active", year: 2016, size: "500+ patterns", desc: "Real design patterns and interactions from the world's best designed apps." },
+  { name: "UI Movement",             url: "https://uimovement.com/",                    cat: "Design",   status: "active", year: 2016, size: "1000+ clips", desc: "The best UI design inspiration curated daily — animations, interactions and interface patterns." },
+  { name: "Freebiesbug",             url: "http://freebiesbug.com/",                    cat: "Design",   status: "active", year: 2013, size: "1000+ freebies", desc: "Hand-picked free resources for designers — UI kits, fonts, mockups, icons and templates." },
+  { name: "Oozled",                  url: "http://oozled.com/",                         cat: "Design",   status: "stale", year: 2014, size: "200+ links", desc: "Curated resources for everything creative — design, photography, typography, code and more." },
+  { name: "Design Notes",            url: "https://www.designnotes.co/",                cat: "Design",   status: "active", year: 2016, size: "150+ resources", desc: "Free resource library for product designers — tools, books, newsletters, podcasts and jobs." },
+  { name: "Designmunk",              url: "https://designmunk.com/",                    cat: "Design",   status: "stale", year: 2015, size: "200+ links", desc: "Hand-picked design resources and inspiration for UI/UX designers and front-end developers." },
+  { name: "Uplabs",                  url: "https://www.uplabs.com/",                    cat: "Design",   status: "active", year: 2015, size: "50k+ assets", desc: "Daily showcase of UI design inspiration, templates and resources submitted by the community." },
+  { name: "Hacking UI",              url: "http://hackingui.com/",                      cat: "Design",   status: "stale", year: 2014, size: "200+ posts", desc: "Curated resources for designers and developers — articles, tools and side project guides." },
+  { name: "Awwwards",                url: "https://www.awwwards.com/",                  cat: "Design",   status: "active", year: 2009, size: "20k+ sites", desc: "Curated gallery of the most awarded websites globally — judged by design, creativity and UX." },
+  { name: "Fonts In Use",            url: "https://fontsinuse.com/",                    cat: "Design",   status: "active", year: 2012, size: "4000+ specimens", desc: "Independent archive of typography in real-world use — searchable by typeface, format or industry." },
+  { name: "Product Disrupt",         url: "http://productdisrupt.com/",                 cat: "Design",   status: "archived",  desc: "Curated collection of disruptive product design patterns, case studies and UX inspiration." },
+  { name: "UI Garage",               url: "https://uigarage.net/",                      cat: "Design",   status: "archived",  desc: "Daily UI inspiration and patterns for designers and developers — searchable by component." },
+  { name: "Product Pages",           url: "http://www.productpages.xyz/",               cat: "Design",   status: "archived",  desc: "Showcase of beautifully designed product landing pages for design inspiration." },
+  { name: "Freestack",               url: "http://freestack.co.uk/",                    cat: "Design",   status: "archived",  desc: "Free Bootstrap templates and UI components for designers and front-end developers." },
+  { name: "One Year of Design",      url: "https://klart.io/one-year-of-design",        cat: "Design",   status: "archived",  desc: "Curated collection of design articles, resources and inspiration compiled over one year." },
+
+  // ── 🖼️ INSPIRATION — visual galleries ─────
+  { name: "Godly.website",           url: "https://godly.website/",                     cat: "Inspiration", status: "active", year: 2021, size: "2000+ sites", desc: "Astronomically good web design inspiration — curated gallery updated daily with best websites." },
+  { name: "Lapa Ninja",              url: "https://www.lapa.ninja/",                    cat: "Inspiration", status: "active", year: 2018, size: "6000+ pages", desc: "The best landing page design inspiration — 6000+ examples curated from real products." },
+  { name: "Land-book",               url: "https://land-book.com/",                     cat: "Inspiration", status: "active", year: 2014, size: "4000+ pages", desc: "Product landing page gallery — hand-curated collection for designers looking for inspiration." },
+  { name: "One Page Love",           url: "https://onepagelove.com/",                   cat: "Inspiration", status: "active", year: 2009, size: "8000+ sites", desc: "Curated gallery of the best single page websites — templates, designs and resources." },
+  { name: "Mobbin",                  url: "https://mobbin.com/",                        cat: "Inspiration", status: "active", year: 2018, size: "300k+ screens", desc: "World's largest mobile and web app design reference library — 300k+ screenshots from top apps." },
+  { name: "Screenlane",              url: "https://screenlane.com/",                    cat: "Inspiration", status: "active", year: 2019, size: "5000+ screens", desc: "Curated mobile UI design inspiration — latest screenshots from iOS and Android apps." },
+  { name: "Scrnshts.club",           url: "https://scrnshts.club/",                     cat: "Inspiration", status: "active", year: 2020, size: "1000+ screens", desc: "Hand-picked collection of the finest app store design screenshots from around the world." },
+  { name: "Refero.design",           url: "https://refero.design/",                     cat: "Inspiration", status: "active", year: 2021, size: "1000+ refs", desc: "Design references from the best product companies — search by pattern, component or flow." },
+  { name: "Pageflows",               url: "https://pageflows.com/",                     cat: "Inspiration", status: "active", year: 2018, size: "500+ flows", desc: "User flow videos and screenshots from top apps to inspire your product design decisions." },
+  { name: "Navbar.gallery",          url: "https://www.navbar.gallery/",                cat: "Inspiration", status: "active", year: 2021, size: "500+ navbars", desc: "Curated gallery of the best navigation bars from around the web — sortable and searchable." },
+  { name: "Footer.design",           url: "https://www.footer.design/",                 cat: "Inspiration", status: "active", year: 2021, size: "400+ footers", desc: "Curated gallery of the best website footers — inspiration for layout, links and CTAs." },
+  { name: "SiteSee",                 url: "https://sitesee.co/",                        cat: "Inspiration", status: "stale", year: 2017, size: "300+ sites", desc: "Curated gallery of beautiful and modern website designs, sorted by style and industry." },
+  { name: "Siteinspire",             url: "https://www.siteinspire.com/",               cat: "Inspiration", status: "active", year: 2008, size: "7000+ sites", desc: "Curated showcase of the finest web and interactive design — 7000+ sites archived since 2008." },
+  { name: "Httpster",                url: "https://httpster.net/",                       cat: "Inspiration", status: "active", year: 2011, size: "1000+ sites", desc: "Showcase of totally rocking websites made by people from around the world." },
+
+  // ── 💻 CODE ───────────────────────────────
+  { name: "Sindre Sorhus Awesome",   url: "https://github.com/sindresorhus/awesome",    cat: "Code",     status: "active", year: 2014, size: "300+ lists", desc: "The original awesome list — curated list of awesome lists covering all things software dev." },
+  { name: "Public APIs",             url: "https://github.com/public-apis/public-apis", cat: "Code",     status: "active", year: 2016, size: "1400+ APIs", desc: "Collective list of free public APIs for software and web development. 300k+ GitHub stars." },
+  { name: "Build Your Own X",        url: "https://github.com/codecrafters-io/build-your-own-x", cat: "Code", status: "active", year: 2018, size: "200+ tutorials", desc: "Master programming by recreating technologies from scratch. 300k+ GitHub stars." },
+  { name: "System Design Primer",    url: "https://github.com/donnemartin/system-design-primer", cat: "Code", status: "active", year: 2017, size: "200+ topics", desc: "Learn how to design large-scale systems — curated resources and interview prep. 270k+ stars." },
+  { name: "Free For Dev",            url: "https://free-for.dev/",                      cat: "Code",     status: "active", year: 2015, size: "400+ services", desc: "Curated list of SaaS, PaaS and IaaS offerings with free tiers relevant to developers." },
+  { name: "Developer Roadmaps",      url: "https://github.com/kamranahmedse/developer-roadmap", cat: "Code", status: "active", year: 2017, size: "20+ roadmaps", desc: "Community-driven roadmaps and resources to choose your learning path as a developer." },
+  { name: "Awesome React",           url: "https://github.com/enaqx/awesome-react",     cat: "Code",     status: "stale", year: 2014, size: "800+ links", desc: "Collection of awesome things in the React ecosystem — libraries, tools, articles, talks." },
+  { name: "CSS Reference",           url: "http://cssreference.io/",                    cat: "Code",     status: "active", year: 2016, size: "120+ properties", desc: "Free visual guide to CSS — the most popular properties with illustrated and animated examples." },
+  { name: "Libhunt",                 url: "https://www.libhunt.com/",                   cat: "Code",     status: "active", year: 2017, size: "50k+ projects", desc: "Discover trending open-source projects and alternatives, ranked by GitHub stars and activity." },
+  { name: "CodeMyUI",                url: "https://codemyui.com/",                      cat: "Code",     status: "active", year: 2015, size: "1500+ snippets", desc: "Handpicked HTML/CSS/JS snippets for web elements — copy-paste ready UI effects and components." },
+  { name: "Frontend Directory",      url: "https://frontend.directory/",                cat: "Code",     status: "stale", year: 2018, size: "200+ links", desc: "Curated list of frontend development resources — frameworks, tools, articles and references." },
+  { name: "Hackr.io",                url: "https://hackr.io/",                          cat: "Code",     status: "active", year: 2017, size: "1000+ courses", desc: "Find the best programming courses and tutorials, voted by the programming community." },
+  { name: "DevFreeBooks",            url: "https://devfreebooks.github.io/",            cat: "Code",     status: "stale", year: 2016, size: "100+ books", desc: "Collection of free books for developers — JavaScript, Python, Go, Docker and many more." },
+  { name: "Pretty Awesome Lists",    url: "https://www.prettyawesomelists.com/lists",   cat: "Code",     status: "stale", year: 2016, size: "500+ lists", desc: "Browse GitHub awesome lists in a beautiful searchable interface with stats and filtering." },
+  { name: "Patterns.dev",            url: "https://www.patterns.dev/",                  cat: "Code",     status: "active", year: 2020, size: "30+ patterns", desc: "Free book and curated list of design and performance patterns for building modern web apps." },
+  { name: "Project Based Learning",  url: "https://github.com/practical-tutorials/project-based-learning", cat: "Code", status: "active", year: 2017, size: "500+ projects", desc: "Curated list of project-based tutorials — learn to build real things in any language." },
+  { name: "Coding Interview Univ.",  url: "https://github.com/jwasham/coding-interview-university", cat: "Code", status: "active", year: 2016, size: "400+ topics", desc: "Complete curated study plan to become a software engineer — 290k+ GitHub stars." },
+  { name: "Unheap",                  url: "http://www.unheap.com/",                     cat: "Code",     status: "stale", year: 2013, size: "800+ plugins", desc: "Repository of jQuery and JavaScript plugins — searchable and categorised for quick discovery." },
+  { name: "Progressive Tooling",     url: "https://progressivetooling.com/",            cat: "Code",     status: "stale", year: 2019, size: "40+ tools", desc: "List of tools to help you build better progressive web apps — performance, accessibility, testing." },
+  { name: "Native Directory",        url: "https://native.directory/",                  cat: "Code",     status: "stale", year: 2016, size: "500+ libs", desc: "Curated list of React Native libraries with ratings, popularity and GitHub stats." },
+  { name: "The Whale",               url: "https://thewhale.cc/",                       cat: "Code",     status: "archived",  desc: "Curated directory of developer tools, resources and links for web and software developers." },
+  { name: "WPStash",                 url: "http://wpstash.io/",                         cat: "Code",     status: "archived",  desc: "Curated collection of WordPress plugins, themes and resources for developers and designers." },
+  { name: "Template Stash",          url: "http://www.templatestash.com/",              cat: "Code",     status: "archived",  desc: "Curated gallery of HTML templates for websites and landing pages, free and premium." },
+  { name: "Bot Stash",               url: "http://www.botsfloor.com/botstash/",         cat: "Code",     status: "archived",  desc: "Curated list of chatbot tools, frameworks, platforms and resources for bot developers." },
+  { name: "Stack Overflow Docs",     url: "http://stackoverflow.com/documentation",     cat: "Code",     status: "archived",  desc: "Community-generated documentation and code examples — shut down in 2017." },
+
+  // ── 🛠️ NO-CODE ────────────────────────────
+  { name: "NoCode.tech",             url: "https://www.nocode.tech/",                   cat: "NoCode",   status: "active", year: 2019, size: "300+ tools", desc: "The best no-code tools organised by category — build anything without writing a line of code." },
+  { name: "No Code List",            url: "https://nocodelist.co/",                     cat: "NoCode",   status: "active", year: 2019, size: "200+ tools", desc: "Curated directory of no-code tools sorted by category to help you build products faster." },
+  { name: "Awesome No-Code",         url: "https://github.com/kairichard/awesome-nocode-lowcode", cat: "NoCode", status: "stale", year: 2020, size: "150+ tools", desc: "GitHub list of the best no-code and low-code platforms, tools and resources for builders." },
+  { name: "Makerpad",                url: "https://www.makerpad.co/",                   cat: "NoCode",   status: "active", year: 2019, size: "500+ tutorials", desc: "Curated no-code tutorials, workflows and case studies — learn to build with the best tools." },
+  { name: "Indie Web Tools",         url: "https://github.com/MrMikeAde/Indie-Web-Tools", cat: "NoCode", status: "stale", year: 2020, size: "100+ tools", desc: "Curated list of tools for indie makers to build, launch and grow web products independently." },
+  { name: "No-Code HQ",              url: "https://www.nocodehq.com/",                  cat: "NoCode",   status: "stale", year: 2020, size: "200+ tools", desc: "Directory and curated resources for no-code makers — tools, tutorials and inspiration." },
+  { name: "Untools",                 url: "https://untools.co/",                        cat: "NoCode",   status: "active", year: 2020, size: "40+ frameworks", desc: "Collection of thinking tools and frameworks to help you solve problems and make decisions." },
+
+  // ── 📈 GROWTH ─────────────────────────────
+  { name: "Marketing Stack",         url: "http://marketingstack.io/",                  cat: "Growth",   status: "active", year: 2015, size: "300+ tools", desc: "Curated collection of marketing tools for every stage — acquisition, retention and revenue." },
+  { name: "Curated SEO Tools",       url: "https://curatedseotools.com/",               cat: "Growth",   status: "active", year: 2017, size: "150+ tools", desc: "Hand-curated list of the best SEO tools — free and paid, for audits, tracking and optimisation." },
+  { name: "Saijo George SEO",        url: "http://saijogeorge.com/best-marketing-tools/", cat: "Growth", status: "active", year: 2015, size: "500+ tools", desc: "Saijo George's personal picks — best SEO and digital marketing tools updated regularly." },
+  { name: "Marketing for Engineers", url: "https://github.com/LisaDziuba/Marketing-for-Engineers", cat: "Growth", status: "active", year: 2017, size: "300+ resources", desc: "Curated list of marketing resources to help engineers promote their products. 13k+ stars." },
+  { name: "Really Good Emails",      url: "https://reallygoodemails.com/",              cat: "Growth",   status: "active", year: 2014, size: "10k+ emails", desc: "Curated library of 10k+ marketing and transactional email designs — the best on the web." },
+  { name: "Swipe Files",             url: "https://swipefiles.com/",                    cat: "Growth",   status: "active", year: 2020, size: "1000+ examples", desc: "Curated library of marketing and copywriting examples — ads, landing pages, emails, sales copy." },
+  { name: "Marketing Resources",     url: "https://usefyi.com/templates/marketing-templates/", cat: "Growth", status: "stale", year: 2018, size: "100+ templates", desc: "Free marketing templates, frameworks and resources curated by the FYI team." },
+  { name: "Growth Handbook",         url: "https://www.julian.com/guide/growth/intro",  cat: "Growth",   status: "active", year: 2019, size: "20+ chapters", desc: "Julian Shapiro's comprehensive curated guide to startup growth — acquisition, content, referral." },
+  { name: "DataStash",               url: "https://www.datastash.co/",                  cat: "Growth",   status: "archived",  desc: "Curated collection of data-driven marketing tools and analytics resources for growth teams." },
+  { name: "Sales List",              url: "https://saleslist.co/",                      cat: "Growth",   status: "archived",  desc: "Curated directory of sales tools, software and resources for sales teams and SDRs." },
+  { name: "Content Marketing Stack", url: "http://www.contentmarketingstack.co/",       cat: "Growth",   status: "archived",  desc: "Curated tools and resources for content marketers — creation, distribution and measurement." },
+  { name: "Good Sales Emails",       url: "http://goodsalesemails.com/",                cat: "Growth",   status: "archived",  desc: "Curated examples of effective B2B sales emails for inspiration and copywriting reference." },
+
+  // ── 🧑‍💼 PRODUCT ──────────────────────────
+  { name: "Awesome PM Resources",    url: "https://github.com/dend/awesome-product-management", cat: "Product", status: "active", year: 2018, size: "200+ resources", desc: "Curated list of awesome resources for product managers to learn and grow. 1.9k GitHub stars." },
+  { name: "Open Product Mgmt",       url: "https://github.com/ProductHired/open-product-management", cat: "Product", status: "active", year: 2018, size: "300+ links", desc: "Curated list of product management advice for technical people — articles, talks, frameworks." },
+  { name: "PM Library",              url: "https://pmlibrary.com/",                     cat: "Product",  status: "active", year: 2019, size: "200+ resources", desc: "Curated collection of the best product management books, articles, podcasts and tools." },
+  { name: "Product Frameworks",      url: "https://productframeworks.io/",              cat: "Product",  status: "active", year: 2020, size: "50+ frameworks", desc: "Collection of product management frameworks — prioritisation, strategy, discovery and delivery." },
+  { name: "Built for Mars",          url: "https://builtformars.com/",                  cat: "Product",  status: "active", year: 2018, size: "100+ teardowns", desc: "Curated UX teardowns and case studies from the world's biggest tech products." },
+  { name: "Awesome Agile",           url: "https://github.com/lorabv/awesome-agile",    cat: "Product",  status: "active", year: 2019, size: "200+ resources", desc: "Curated list of resources on agile software development — Scrum, Kanban, SAFe and more." },
+  { name: "PM Resources (GH)",       url: "https://github.com/prakashsellathurai/Awesome-Product-Management", cat: "Product", status: "active", year: 2019, size: "300+ links", desc: "Curated list of PM resources — roadmapping, metrics, user research, strategy and hiring." },
+
+  // ── 📄 RESEARCH — curated papers & reading lists ──
+  { name: "Papers With Code",        url: "https://paperswithcode.com/",                cat: "Research", status: "active", year: 2018, size: "100k+ papers", desc: "Free resource of ML papers with code — trending research, benchmarks and state-of-the-art." },
+  { name: "Hugging Face Papers",     url: "https://huggingface.co/papers",              cat: "Research", status: "active", year: 2022, size: "daily picks", desc: "Daily curated list of the most important AI and ML research papers by the Hugging Face community." },
+  { name: "ML Papers Explained",     url: "https://github.com/dair-ai/ML-Papers-Explained", cat: "Research", status: "active", year: 2022, size: "100+ papers", desc: "Curated list of key ML papers with explanations in plain language — maintained by DAIR.AI." },
+  { name: "Arxiv Sanity",            url: "https://arxiv-sanity-lite.com/",             cat: "Research", status: "active", year: 2016, size: "200k+ papers", desc: "Helps you keep up with ML Arxiv papers — filter, search and surface the most relevant research." },
+  { name: "AI Canon",                url: "https://a16z.com/ai-canon/",                 cat: "Research", status: "active", desc: "Curated reading list of the most important AI papers, courses and blogs by Andreessen Horowitz." },
+  { name: "The Gradient",            url: "https://thegradient.pub/",                   cat: "Research", status: "active", year: 2017, size: "200+ articles", desc: "Curated publication covering research in AI and ML — accessible deep dives and perspectives." },
+  { name: "Distill.pub",             url: "https://distill.pub/",                       cat: "Research", status: "active", year: 2016, size: "50+ articles", desc: "Curated journal of clear and interactive ML research — peer-reviewed and beautifully presented." },
+
+  // ── 📱 MOBILE ─────────────────────────────
+  { name: "App Launch Checklist",    url: "https://branch.io/resources/app-launch-checklist/", cat: "Mobile", status: "active", year: 2016, size: "60+ items", desc: "Step-by-step checklist for launching a mobile app — marketing, ASO, deep links and analytics." },
+  { name: "Learn Mobile Design",     url: "https://learnmobile.design/",                cat: "Mobile",   status: "active", year: 2018, size: "100+ resources", desc: "Curated resources to learn mobile UI/UX design — courses, books, tools and inspiration." },
+  { name: "App Marketing Stack",     url: "http://appmarketingstack.com/",              cat: "Mobile",   status: "archived",  desc: "Curated collection of app marketing tools and resources for mobile developers and marketers." },
+  { name: "Mobile Stack",            url: "http://www.mobilestack.io/",                 cat: "Mobile",   status: "archived",  desc: "Curated list of the best mobile development tools, SDKs and resources for app developers." },
+  { name: "iOS Stack",               url: "http://iosstack.com/",                       cat: "Mobile",   status: "archived",  desc: "Curated collection of tools, frameworks and resources for iOS development." },
+  { name: "iOS Cookies",             url: "http://www.ioscookies.com/",                 cat: "Mobile",   status: "archived",  desc: "Hand-picked collection of iOS Swift libraries, sorted and categorised for developers." },
+
+  // ── 🌍 REMOTE ─────────────────────────────
+  { name: "Remotive",                url: "https://remotive.io/",                       cat: "Remote",   status: "active", year: 2014, size: "1000+ jobs", desc: "Curated list of remote tech jobs — hand-screened positions at top companies, updated daily." },
+  { name: "Working Nomads",          url: "https://www.workingnomads.co/jobs",          cat: "Remote",   status: "active", year: 2015, size: "1000+ jobs", desc: "Curated list of the best remote job opportunities in the most sought-after categories." },
+  { name: "Nomad List",              url: "https://nomadlist.com/",                     cat: "Remote",   status: "active", year: 2014, size: "1000+ cities", desc: "Best cities to live and work remotely — ranked by cost, internet speed and quality of life." },
+  { name: "Key Values",              url: "https://www.keyvalues.com/culture-queries",  cat: "Remote",   status: "active", year: 2017, size: "300+ companies", desc: "Curated directory of engineering teams with shared values — searchable by culture and practices." },
+  { name: "Nodesk",                  url: "http://nodesk.co/",                          cat: "Remote",   status: "active", year: 2016, size: "200+ resources", desc: "Curated resources for digital nomads and remote workers — tools, cities, visas and co-working." },
+  { name: "Remote Tools",            url: "https://remote.tools/",                      cat: "Remote",   status: "active", year: 2019, size: "700+ tools", desc: "Curated directory of 700+ tools and resources for remote teams — by category and use case." },
+  { name: "NicheBoard",              url: "https://nicheboard.co",                      cat: "Remote",   status: "archived",  desc: "Directory of niche job boards — find specialised boards for your industry or skill set." },
+  { name: "Remote Work Stash",       url: "http://www.remoteworkstash.com/",            cat: "Remote",   status: "archived",  desc: "Curated collection of remote work tools, resources and articles for distributed teams." },
+  { name: "Nomadic Space",           url: "https://nomadic.space/",                     cat: "Remote",   status: "archived",  desc: "Directory of co-working spaces and coliving spots for digital nomads around the world." },
+
+// ── 🇧🇪 BELGIUM — digital ecosystem ─────
+{ name: "Startups.be", url: "https://startups.be/", cat: "Belgium", status: "active", year: 2011, size: "National network", desc: "Belgian startup association connecting founders, investors and ecosystem players." },
+{ name: "Scale-Ups.eu", url: "https://scale-ups.eu/", cat: "Belgium", status: "active", year: 2020, size: "Scale-up network", desc: "Community and network supporting Belgian and European scale-ups." },
+{ name: "Agoria", url: "https://www.agoria.be/", cat: "Belgium", status: "active", year: 1946, size: "Tech federation", desc: "Belgian federation for technology companies and digital innovation." },
+{ name: "imec.istart", url: "https://www.imecistart.com/", cat: "Belgium", status: "active", year: 2011, size: "Accelerator", desc: "Belgian deeptech accelerator supporting hardware and software startups." },
+{ name: "BeCentral", url: "https://www.becentral.org/", cat: "Belgium", status: "active", year: 2017, size: "Digital campus", desc: "Digital campus in Brussels bringing together startups, scale-ups and tech communities." },
+{ name: "Start it @KBC", url: "https://startit.kbc.be/", cat: "Belgium", status: "active", year: 2016, size: "Accelerator", desc: "One of Belgium’s largest startup accelerators with a broad founder community." },
+{ name: "StartupMap.one", url: "https://startupmap.one/", cat: "Startups", status: "active", year: 2023, size: "Startup directories", desc: "Curated map of startup directories and platforms where founders can submit and promote their products." },
+
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let data = [...STACKS];
+let activeFilter = 'all';
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function getDomain(url) {
+  try { return new URL(url).hostname.replace('www.', ''); }
+  catch { return url; }
+}
+
+function getThumbnailUrl(url, thumb) {
+  if (thumb) return thumb;
+  return `https://image.thum.io/get/width/600/crop/338/${url}`;
+}
+
+function getFaviconUrl(url) {
+  const domain = getDomain(url);
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+}
+
+// ─────────────────────────────────────────────
+// CATEGORIES
+// ─────────────────────────────────────────────
+const CAT_LABELS = {
+  all:         'All',
+  AI:          '🤖 AI Tools',
+  AICharts:    '📊 AI Charts',
+  AIWorkflows: '🧠 AI Workflow Libraries',
+  BuilderOS: '⚙️ Builder OS',
+  DesignSystems: '🎨 Design Systems',
+  ProductTools: '🧑‍💼 Product People',
+  Research:    '📄 Research',
+  Startups:    '🚀 Startups',
+  Design:      '🎨 Design',
+  Inspiration: '🖼️ Inspiration',
+  Code:        '💻 Code',
+  NoCode:      '🛠️ No-Code',
+  Growth:      '📈 Growth',
+  Product:     '🧑‍💼 Product',
+  Mobile:      '📱 Mobile',
+  Remote:      '🌍 Remote',
+  Belgium:     '🇧🇪 Belgium',
+};
+
+const CAT_ORDER = [
+  'all',
+  'AI',
+  'AICharts',
+  'AIWorkflows',
+  'BuilderOS',
+  'DesignSystems',
+  'ProductTools',
+  'Research',
+  'Startups',
+  'Code',
+  'NoCode',
+  'Growth',
+  'Product',
+  'Mobile',
+  'Remote',
+  'Belgium'
+];
+
+function getCategories() {
+  const cats = {};
+  data.forEach(s => { cats[s.cat] = (cats[s.cat] || 0) + 1; });
+  return cats;
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function renderFilterPills() {
+  const cats = getCategories();
+  const container = document.getElementById('filter-pills');
+  const allCount = data.length;
+
+  const pillsHtml = CAT_ORDER.filter(c => c === 'all' || cats[c]).map(cat => {
+    const label = CAT_LABELS[cat] || cat;
+    const count = cat === 'all' ? allCount : (cats[cat] || 0);
+    return `<button class="filter-pill" data-cat="${cat}" onclick="setFilter('${cat}')">
+      ${label}<span class="pill-count">${count}</span>
+    </button>`;
+  }).join('');
+
+  container.innerHTML = pillsHtml;
+}
+
+function buildCard(item) {
+  const domain = getDomain(item.url);
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+  const s = item.status || 'active';
+  const letter = item.name[0] || '?';
+  const desc = item.desc || '';
+
+  const badge = s === 'archived' ? '<span class="badge-archived">archived</span>'
+              : s === 'stale'    ? '<span class="badge-stale">stale</span>'
+              : '';
+  const cls = s === 'archived' ? ' archived' : s === 'stale' ? ' stale' : '';
+
+  const yearBadge = item.year ? `<span class="badge-year">📅 ${item.year}</span>` : '';
+  const sizeBadge = item.size ? `<span class="badge-size">🗃️ ${item.size}</span>` : '';
+  const metaRow = (yearBadge || sizeBadge)
+    ? `<div class="card-meta">${yearBadge}${sizeBadge}</div>` : '';
+
+  return `<a class="card${cls}" href="${item.url}" target="_blank" rel="noopener">
+      <div class="card-favicon">
+        <img src="${faviconUrl}" alt="" onerror="this.style.display='none';this.parentNode.innerHTML='<span class=&quot;favicon-letter&quot;>${letter}</span>'">
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="card-name">${item.name}</span>
+          <span class="card-url">${domain}</span>
+          ${badge}
+        </div>
+        ${desc ? `<span class="card-desc">${desc}</span>` : ''}
+        ${metaRow}
+      </div>
+    </a>`;
+}
+
+function renderGrid() {
+  const query = document.getElementById('search-input').value.toLowerCase().trim();
+  const container = document.getElementById('main-content');
+  const emptyState = document.getElementById('empty-state');
+
+  // Group by category
+  const grouped = {};
+  let totalVisible = 0;
+
+  const filtered = data.filter(item => {
+    const matchSearch = !query || item.name.toLowerCase().includes(query) || getDomain(item.url).includes(query);
+    return matchSearch;
+  });
+
+  filtered.forEach(item => {
+    if (!grouped[item.cat]) grouped[item.cat] = [];
+    grouped[item.cat].push(item);
+    totalVisible++;
+  });
+
+  emptyState.classList.add('hidden');
+
+  const catOrder = CAT_ORDER.filter(c => c !== 'all');
+  let html = '';
+
+  catOrder.forEach(cat => {
+    if (!grouped[cat] || grouped[cat].length === 0) return;
+    html += `
+      <div class="category-section" data-cat="${cat}">
+        <h2 class="category-title">
+          ${CAT_LABELS[cat] || cat}
+          <span class="cat-count">${grouped[cat].length}</span>
+        </h2>
+        <div class="grid">
+          ${grouped[cat].map(buildCard).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+
+
+// Pills are SCROLL ANCHORS — never filter the list
+function setFilter(cat) {
+  if (cat === 'all') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    highlightPill('all');
+    return;
+  }
+  const section = document.querySelector(`.category-section[data-cat="${cat}"]`);
+  if (section) {
+    // offset by header height
+const stickyH = document.getElementById('sticky-controls')?.offsetHeight || 0;
+const top = section.getBoundingClientRect().top + window.scrollY - stickyH - 12;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+  highlightPill(cat);
+}
+
+function filterCards() {
+  renderGrid();
+  setTimeout(initScrollSpy, 80);
+}
+
+// ─────────────────────────────────────────────
+// SCROLL-SPY  (scroll event, stable)
+// ─────────────────────────────────────────────
+function highlightPill(cat) {
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+  });
+}
+
+function getCurrentCat() {
+  const headerH = document.querySelector('header')?.offsetHeight || 0;
+  // Threshold: 30% down from header bottom
+  const threshold = headerH + window.innerHeight * 0.18;
+  const sections = [...document.querySelectorAll('.category-section[data-cat]')];
+  if (!sections.length) return 'all';
+
+  // Walk from bottom up — first section whose top is above threshold wins
+  let active = sections[0];
+  for (const s of sections) {
+    const top = s.getBoundingClientRect().top;
+    if (top <= threshold) active = s;
+  }
+  // If the very first section hasn't reached threshold yet, show 'all'
+  if (sections[0].getBoundingClientRect().top > threshold + 40) return 'all';
+  return active.getAttribute('data-cat');
+}
+
+let rafPending = false;
+function onScroll() {
+  if (rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(() => {
+    rafPending = false;
+    highlightPill(getCurrentCat());
+  });
+}
+
+function initScrollSpy() {
+  window.removeEventListener('scroll', onScroll);
+  const sections = document.querySelectorAll('.category-section[data-cat]');
+  if (!sections.length) return;
+  window.addEventListener('scroll', onScroll, { passive: true });
+  // Fire once immediately
+  highlightPill(getCurrentCat());
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+renderFilterPills();
+renderGrid();
+setTimeout(initScrollSpy, 100);
+// ─────────────────────────────────────────────
+function toggleAirtable() {
+  const bar = document.getElementById('airtable-bar');
+  bar.classList.toggle('open');
+}
+
+async function loadFromAirtable() {
+  const token = document.getElementById('at-token').value.trim();
+  const baseId = document.getElementById('at-base').value.trim();
+  const tableName = document.getElementById('at-table').value.trim() || 'Stacks';
+  const statusEl = document.getElementById('at-status');
+  const spinner = document.getElementById('at-spinner');
+  const btnText = document.getElementById('at-btn-text');
+
+  if (!token || !baseId) {
+    statusEl.textContent = '⚠ Token and Base ID required';
+    statusEl.style.color = 'var(--dead)';
+    return;
+  }
+
+  spinner.classList.remove('hidden');
+  btnText.textContent = '';
+  statusEl.textContent = 'Fetching...';
+  statusEl.style.color = 'var(--muted)';
+
+  try {
+    const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?pageSize=100`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    const json = await res.json();
+
+    const records = json.records || [];
+    if (records.length === 0) {
+      statusEl.textContent = '⚠ No records found';
+      statusEl.style.color = 'var(--dead)';
+      return;
+    }
+
+    // Map Airtable fields → our format
+    const atData = records.map(r => {
+      const f = r.fields;
+      return {
+        name: f.Name || f.name || 'Untitled',
+        url: f.URL || f.url || f.Link || '#',
+        cat: f.Category || f.category || 'Other',
+        status: (f.Status || f.status || 'unknown').toLowerCase(),
+        thumbnail: f.Thumbnail || f.thumbnail || null,
+      };
+    });
+
+    data = atData;
+    activeFilter = 'all';
+    renderFilterPills();
+    renderGrid();
+
+    statusEl.textContent = `✓ Loaded ${records.length} records from Airtable`;
+    statusEl.style.color = 'var(--accent)';
+
+    // Auto-close bar
+    setTimeout(() => { document.getElementById('airtable-bar').classList.remove('open'); }, 1500);
+
+  } catch (err) {
+    statusEl.textContent = `✗ ${err.message}`;
+    statusEl.style.color = 'var(--dead)';
+  } finally {
+    spinner.classList.add('hidden');
+    btnText.textContent = 'Load';
+  }
+}
+
+// ─────────────────────────────────────────────
+// AIRTABLE
+
+function openSubmitModal() {
+  document.getElementById('submit-modal').classList.remove('hidden');
+}
+
+function closeSubmitModal() {
+  document.getElementById('submit-modal').classList.add('hidden');
+}
+
+function submitStack() {
+  const name = document.getElementById('stack-name').value.trim();
+  const url = document.getElementById('stack-url').value.trim();
+  const cat = document.getElementById('stack-category').value.trim();
+  const desc = document.getElementById('stack-desc').value.trim();
+
+  if (!name || !url) {
+    alert("Name and URL required");
+    return;
+  }
+
+  const subject = encodeURIComponent("New Stack Submission");
+  const body = encodeURIComponent(
+`Name: ${name}
+URL: ${url}
+Category: ${cat}
+Description: ${desc}`
+  );
+
+  window.location.href = `mailto:mini@appvelvet.com?subject=${subject}&body=${body}`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+
+
+    const backBtn = document.getElementById('backToTop');
+
+  function updateBackToTop(){
+    if (!backBtn) return;
+    const show = window.scrollY > 400;
+    backBtn.classList.toggle('back-show', show);
+    backBtn.classList.toggle('back-hidden', !show);
+  }
+
+  window.addEventListener('scroll', updateBackToTop, { passive: true });
+  updateBackToTop();
+  
+});
+
+</script>
+<div class="modal-overlay hidden" id="submit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Submit a Stack</h3>
+      <button class="modal-close" onclick="closeSubmitModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <input type="text" id="stack-name" placeholder="Stack name">
+      <input type="text" id="stack-url" placeholder="https://...">
+      <input type="text" id="stack-category" placeholder="Category (AI, Design, Belgium...)">
+      <textarea id="stack-desc" placeholder="Short description (optional)"></textarea>
+
+      <button class="btn btn-primary" onclick="submitStack()">Send</button>
+    </div>
+  </div>
+</div>
+<button id="backToTop" class="back-to-top back-hidden" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+  ↑ Top
+</button>
+</body>
+</html>

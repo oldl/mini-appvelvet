@@ -1,10 +1,437 @@
-<h1>Mini Apps</h1>
-<ul>
-<li><a href="/sunspots/">Sunspots</a></li>
-<li><a href="/belgium-ipsum/">Belgium Ipsum</a></li>
-<li><a href="/wsjf-turbo/">WSJF Turbo</a></li>
-<li><a href="/drache-t-il/">Drache</a></li>
-<li><a href="/could-be-an-email/">Could Be An Email</a></li>
-<li><a href="/stack-of-stack/">Stack of Stack</a></li>
-<li><a href="/todonacci/">Todonacci</a></li>
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APPVELVET / MINI LAB</title>
+<meta name="description" content="26 mini side projects. No-code. Low-code. Shipped fast.">
+<meta property="og:title" content="Appvelvet — Mini Lab">
+<meta property="og:description" content="26 mini side projects. No-code. Low-code. Shipped fast.">
+<meta property="og:url" content="https://mini.appvelvet.com">
+<meta property="og:type" content="website">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:     #0a0a0a;
+    --white:  #f0f0eb;
+    --gray:   #333;
+    --lgray:  #666;
+    --c1: #b8ff3c;
+    --c2: #ff3cdc;
+    --c3: #3cddff;
+    --c4: #ff9f3c;
+    --c5: #ffe03c;
+    --c6: #ff3c3c;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    cursor: default;
+  }
+
+  /* NOISE */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 10;
+    padding: 32px 48px 0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+
+  .header-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px; letter-spacing: 0.25em;
+    color: var(--lgray); text-decoration: none;
+    transition: color 0.15s;
+  }
+  .header-brand:hover { color: var(--white); }
+  .header-brand span { color: var(--c1); }
+
+  .header-counter {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+    color: var(--lgray); text-transform: uppercase;
+    text-align: right; line-height: 1.6;
+  }
+
+  .header-counter strong {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 0.04em;
+    color: var(--c1); display: block;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    padding: 56px 48px 48px;
+    border-bottom: 1px solid var(--gray);
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.3em;
+    color: var(--lgray); text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 12vw, 140px);
+    line-height: 0.88; letter-spacing: 0.02em;
+    color: var(--white);
+    margin-bottom: 28px;
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: var(--c1);
+  }
+
+  .hero-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; letter-spacing: 0.12em;
+    color: var(--lgray); line-height: 1.8;
+    max-width: 560px; text-transform: uppercase;
+  }
+
+  /* TAGS */
+  .hero-tags {
+    display: flex; flex-wrap: wrap;
+    gap: 8px; margin-top: 28px;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 6px 12px; border: 1px solid var(--gray);
+    color: var(--lgray);
+  }
+
+  /* ── GRID ── */
+  .grid-section {
+    position: relative; z-index: 1;
+    padding: 0 48px 80px;
+  }
+
+  .grid-header {
+    display: flex; justify-content: space-between;
+    align-items: center; padding: 32px 0 24px;
+    border-bottom: 1px solid var(--gray);
+    margin-bottom: 0;
+  }
+
+  .grid-header-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px; letter-spacing: 0.25em;
+    color: var(--lgray); text-transform: uppercase;
+  }
+
+  .grid-header-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 0.2em;
+    color: #333; text-transform: uppercase;
+  }
+
+  /* APP ROWS */
+  .app-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    gap: 0;
+    border-bottom: 1px solid #1a1a1a;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.12s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-row::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 0;
+    transition: width 0.2s cubic-bezier(0.22,1,0.36,1);
+    z-index: 0;
+  }
+
+  .app-row:hover::before { width: 4px; }
+  .app-row:hover { background: #111; }
+
+  /* Color accent per row */
+  .app-row.c1::before { background: var(--c1); }
+  .app-row.c2::before { background: var(--c2); }
+  .app-row.c3::before { background: var(--c3); }
+  .app-row.c4::before { background: var(--c4); }
+  .app-row.c5::before { background: var(--c5); }
+  .app-row.c6::before { background: var(--c6); }
+
+  .app-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px; letter-spacing: 0.1em;
+    color: #2a2a2a; padding: 20px 0 20px 20px;
+    position: relative; z-index: 1;
+  }
+
+  .app-body {
+    padding: 20px 24px;
+    position: relative; z-index: 1;
+  }
+
+  .app-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 0.04em;
+    line-height: 1; color: var(--white);
+    margin-bottom: 5px;
+    transition: color 0.12s;
+  }
+
+  .app-row:hover .app-name { color: var(--white); }
+  .app-row.c1:hover .app-name { color: var(--c1); }
+  .app-row.c2:hover .app-name { color: var(--c2); }
+  .app-row.c3:hover .app-name { color: var(--c3); }
+  .app-row.c4:hover .app-name { color: var(--c4); }
+  .app-row.c5:hover .app-name { color: var(--c5); }
+  .app-row.c6:hover .app-name { color: var(--c6); }
+
+  .app-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: #444; text-transform: uppercase;
+    line-height: 1.5;
+  }
+
+  .app-right {
+    padding: 20px 20px 20px 0;
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 6px;
+    position: relative; z-index: 1;
+  }
+
+  .app-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: 0.2em;
+    text-transform: uppercase; padding: 4px 10px;
+  }
+
+  .status-live { background: var(--c1); color: #0a0a0a; }
+  .status-soon { background: #1f1f1f; color: var(--lgray); border: 1px solid #333; }
+  .status-wip  { background: var(--c5); color: #0a0a0a; }
+
+  .app-arrow {
+    font-size: 16px; color: #333;
+    transition: color 0.12s, transform 0.15s;
+  }
+  .app-row:hover .app-arrow { color: var(--white); transform: translateX(4px); }
+
+  /* COMING SOON ROWS */
+  .app-row.upcoming {
+    opacity: 0.4; pointer-events: none;
+    cursor: default;
+  }
+
+  /* SLOTS */
+  .slots-row {
+    display: flex; flex-wrap: wrap;
+    gap: 8px; padding: 28px 0 0;
+  }
+
+  .slot {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px; letter-spacing: 0.12em;
+    padding: 8px 16px;
+    border: 1px solid #1f1f1f; color: #2a2a2a;
+    min-width: 48px; text-align: center;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    padding: 28px 48px;
+    border-top: 1px solid var(--gray);
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px; letter-spacing: 0.2em; color: var(--lgray);
+  }
+
+  .footer-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em;
+    color: var(--lgray); text-decoration: none;
+    text-transform: uppercase;
+    border-bottom: 1px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .footer-link:hover { color: var(--white); border-bottom-color: var(--white); }
+
+  /* STAGGER ANIMATION */
+  .app-row {
+    animation: fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .app-row:nth-child(1) { animation-delay: 0.05s; }
+  .app-row:nth-child(2) { animation-delay: 0.10s; }
+  .app-row:nth-child(3) { animation-delay: 0.15s; }
+  .app-row:nth-child(4) { animation-delay: 0.20s; }
+  .app-row:nth-child(5) { animation-delay: 0.25s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+
+  @media (max-width: 600px) {
+    header, .hero, .grid-section, footer { padding-left: 20px; padding-right: 20px; }
+    .hero-title { font-size: 72px; }
+    .app-row { grid-template-columns: 40px 1fr auto; }
+    .app-name { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="header-brand" href="https://appvelvet.be">APPVELVET <span>/</span> MINI</a>
+  <div class="header-counter">
+    2026 goal<br>
+    <strong>2 / 26</strong>
+    shipped
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">Appvelvet — Product Lab</div>
+  <h1 class="hero-title">MINI<br><em>LAB</em></h1>
+  <p class="hero-desc">
+    26 experimental side projects.<br>
+    No-code. Low-code. Shipped fast.<br>
+    One idea at a time.
+  </p>
+  <div class="hero-tags">
+    <span class="tag">⚡ Rapid prototyping</span>
+    <span class="tag">🧪 UX experiments</span>
+    <span class="tag">🤖 AI-augmented</span>
+    <span class="tag">🇧🇪 Made in Belgium</span>
+    <span class="tag">2026</span>
+  </div>
+</section>
+
+<section class="grid-section">
+  <div class="grid-header">
+    <span class="grid-header-title">Projects</span>
+    <span class="grid-header-meta">Sorted by ship date</span>
+  </div>
+
+  <!-- LIVE APPS -->
+  <a class="app-row c1" href="/could-be-an-email/">
+    <div class="app-num">01</div>
+    <div class="app-body">
+      <div class="app-name">Could Be An Email</div>
+      <div class="app-desc">Calculate the real cost of your meeting — in seconds</div>
+    </div>
+    <div class="app-right">
+      <span class="app-status status-live">Live</span>
+      <span class="app-arrow">→</span>
+    </div>
+  </a>
+
+  <a class="app-row c3" href="/drache-t-il/">
+    <div class="app-num">02</div>
+    <div class="app-body">
+      <div class="app-name">Drache-t-il demain ?</div>
+      <div class="app-desc">Météo humoristique — probabilité de pluie en Belgique</div>
+    </div>
+    <div class="app-right">
+      <span class="app-status status-live">Live</span>
+      <span class="app-arrow">→</span>
+    </div>
+  </a>
+
+  <a class="app-row c2" href="/belgium-ipsum/">
+    <div class="app-num">03</div>
+    <div class="app-body">
+      <div class="app-name">Belgium Ipsum</div>
+      <div class="app-desc">Lorem ipsum à la sauce belge — stoemp, zwanze, brusseleir</div>
+    </div>
+    <div class="app-right">
+      <span class="app-status status-live">Live</span>
+      <span class="app-arrow">→</span>
+    </div>
+  </a>
+
+  <a class="app-row c4" href="/todonacci/">
+    <div class="app-num">04</div>
+    <div class="app-body">
+      <div class="app-name">Todonacci</div>
+      <div class="app-desc">To-do list basée sur la grille de Fibonacci</div>
+    </div>
+    <div class="app-right">
+      <span class="app-status status-live">Live</span>
+      <span class="app-arrow">→</span>
+    </div>
+  </a>
+
+  <a class="app-row c5" href="/sunspots">
+    <div class="app-num">05</div>
+    <div class="app-body">
+      <div class="app-name">Sunspots</div>
+      <div class="app-desc">Discover sunspots in real-time</div>
+    </div>
+    <div class="app-right">
+      <span class="app-status status-live">Live</span>
+      <span class="app-arrow">→</span>
+    </div>
+  </a>
+
+  <!-- UPCOMING SLOT -->
+  <div class="app-row upcoming c6">
+    <div class="app-num">06</div>
+    <div class="app-body">
+      <div class="app-name">???</div>
+      <div class="app-desc">Next experiment — loading</div>
+    </div>
+    <div class="app-right">
+      <span class="app-status status-soon">Soon</span>
+    </div>
+  </div>
+
+  <!-- EMPTY SLOTS 07–26 -->
+  <div class="slots-row" id="slots"></div>
+</section>
+
+<footer>
+  <span class="footer-brand">APPVELVET © 2026</span>
+  <a class="footer-link" href="https://appvelvet.be">appvelvet.be</a>
+</footer>
+
+<script>
+  // Render empty slots 07–26
+  const container = document.getElementById('slots');
+  for (let i = 7; i <= 26; i++) {
+    const el = document.createElement('div');
+    el.className = 'slot';
+    el.textContent = String(i).padStart(2, '0');
+    container.appendChild(el);
+  }
+</script>
+
+</body>
+</html>

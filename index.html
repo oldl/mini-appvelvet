@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9LTQGK91J6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-9LTQGK91J6');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>APPVELVET / MINI LAB</title>
@@ -304,6 +313,16 @@
     .app-row { grid-template-columns: 40px 1fr auto; }
     .app-name { font-size: 22px; }
   }
+  .blur-title {
+  filter: blur(4px);
+  opacity: 0.8;
+  transition: filter 0.25s ease, opacity 0.25s ease;
+}
+
+.app-row:hover .blur-title {
+  filter: blur(0);
+  opacity: 1;
+}
 </style>
 </head>
 <body>
@@ -321,9 +340,9 @@
   <div class="hero-eyebrow">Appvelvet — Product Lab</div>
   <h1 class="hero-title">MINI<br><em>LAB</em></h1>
   <p class="hero-desc">
-    26 experimental side projects.<br>
-    No-code. Low-code. Shipped fast.<br>
-    One idea at a time.
+    26 experimental mini side projects.<br>
+    No-code. Low-code. Shipped fast. Maybe too fast<br>
+    One idea at a time without trying to not reak the others
   </p>
   <div class="hero-tags">
     <span class="tag">⚡ Rapid prototyping</span>
@@ -344,7 +363,7 @@
   <a class="app-row c1" href="/could-be-an-email/">
     <div class="app-num">01</div>
     <div class="app-body">
-      <div class="app-name">Could Be An Email</div>
+      <div class="app-name">Could Be An Email?</div>
       <div class="app-desc">Calculate the real cost of your meeting — in seconds</div>
     </div>
     <div class="app-right">
@@ -388,9 +407,31 @@
       <span class="app-arrow">→</span>
     </div>
   </a>
+ <a class="app-row c5" href="/stack-of-stack">
+    <div class="app-num">05</div>
+    <div class="app-body">
+      <div class="app-name">Stack of Stack</div>
+      <div class="app-desc">A curated list of the best curated lists</div>
+    </div>
+    <div class="app-right">
+      <span class="app-status status-live">Live</span>
+      <span class="app-arrow">→</span>
+    </div>
+  
+</a> <a class="app-row c5" href="/wsjf-turbo">
+    <div class="app-num">06</div>
+    <div class="app-body">
+      <div class="app-name">WSJF Turbo</div>
+      <div class="app-desc">Instant Backlog Prioritization Tool</div>
+    </div>
+    <div class="app-right">
+      <span class="app-status status-live">Live</span>
+      <span class="app-arrow">→</span>
+    </div>
+  </a>
 
   <a class="app-row c5" href="/sunspots">
-    <div class="app-num">05</div>
+    <div class="app-num">07</div>
     <div class="app-body">
       <div class="app-name">Sunspots</div>
       <div class="app-desc">Discover sunspots in real-time</div>
@@ -403,9 +444,9 @@
 
   <!-- UPCOMING SLOT -->
   <div class="app-row upcoming c6">
-    <div class="app-num">06</div>
+    <div class="app-num">08</div>
     <div class="app-body">
-      <div class="app-name">???</div>
+      <div class="app-name blur-title">Out of office</div>
       <div class="app-desc">Next experiment — loading</div>
     </div>
     <div class="app-right">

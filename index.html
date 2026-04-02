@@ -33,6 +33,8 @@
     --c4: #ff9f3c;
     --c5: #ffe03c;
     --c6: #ff3c3c;
+    --c7: #9b7bff;
+    --c8: #3cff9e;
   }
 
   html { scroll-behavior: smooth; }
@@ -157,6 +159,8 @@
 
   /* APP ROWS */
   .app-row {
+    --accent: var(--c1);
+    --accent-soft: rgba(184, 255, 60, 0.08);
     display: grid;
     grid-template-columns: 56px 1fr auto;
     align-items: center;
@@ -187,6 +191,8 @@
   .app-row.c4::before { background: var(--c4); }
   .app-row.c5::before { background: var(--c5); }
   .app-row.c6::before { background: var(--c6); }
+  .app-row.c7::before { background: var(--c7); }
+  .app-row.c8::before { background: var(--c8); }
 
   .app-num {
     font-family: 'Bebas Neue', sans-serif;
@@ -198,6 +204,7 @@
   .app-body {
     padding: 20px 24px;
     position: relative; z-index: 1;
+    transition: background-color 0.12s ease, color 0.12s ease;
   }
 
   .app-name {
@@ -208,13 +215,8 @@
     transition: color 0.12s;
   }
 
-  .app-row:hover .app-name { color: var(--white); }
-  .app-row.c1:hover .app-name { color: var(--c1); }
-  .app-row.c2:hover .app-name { color: var(--c2); }
-  .app-row.c3:hover .app-name { color: var(--c3); }
-  .app-row.c4:hover .app-name { color: var(--c4); }
-  .app-row.c5:hover .app-name { color: var(--c5); }
-  .app-row.c6:hover .app-name { color: var(--c6); }
+  .app-row:hover .app-body { background: var(--accent-soft); }
+  .app-row:hover .app-name { color: var(--accent); }
 
   .app-desc {
     font-family: 'DM Mono', monospace;
@@ -245,6 +247,15 @@
     transition: color 0.12s, transform 0.15s;
   }
   .app-row:hover .app-arrow { color: var(--white); transform: translateX(4px); }
+
+  .app-row.c1 { --accent: var(--c1); --accent-soft: rgba(184, 255, 60, 0.08); }
+  .app-row.c2 { --accent: var(--c2); --accent-soft: rgba(255, 60, 220, 0.08); }
+  .app-row.c3 { --accent: var(--c3); --accent-soft: rgba(60, 221, 255, 0.08); }
+  .app-row.c4 { --accent: var(--c4); --accent-soft: rgba(255, 159, 60, 0.08); }
+  .app-row.c5 { --accent: var(--c5); --accent-soft: rgba(255, 224, 60, 0.08); }
+  .app-row.c6 { --accent: var(--c6); --accent-soft: rgba(255, 60, 60, 0.08); }
+  .app-row.c7 { --accent: var(--c7); --accent-soft: rgba(155, 123, 255, 0.09); }
+  .app-row.c8 { --accent: var(--c8); --accent-soft: rgba(60, 255, 158, 0.09); }
 
   /* COMING SOON ROWS */
   .app-row.upcoming {
@@ -331,7 +342,7 @@
   <a class="header-brand" href="https://appvelvet.be">APPVELVET <span>/</span> MINI</a>
   <div class="header-counter">
     2026 goal<br>
-    <strong>2 / 26</strong>
+    <strong>7/26</strong>
     shipped
   </div>
 </header>
@@ -342,7 +353,7 @@
   <p class="hero-desc">
     26 experimental mini side projects.<br>
     No-code. Low-code. Shipped fast. Maybe too fast<br>
-    One idea at a time without trying to not reak the others
+    One idea at a time without trying to not break the others
   </p>
   <div class="hero-tags">
     <span class="tag">⚡ Rapid prototyping</span>
@@ -407,7 +418,7 @@
       <span class="app-arrow">→</span>
     </div>
   </a>
- <a class="app-row c5" href="/stack-of-stack">
+ <a class="app-row c7" href="/stack-of-stack">
     <div class="app-num">05</div>
     <div class="app-body">
       <div class="app-name">Stack of Stack</div>
@@ -418,7 +429,7 @@
       <span class="app-arrow">→</span>
     </div>
   
-</a> <a class="app-row c5" href="/wsjf-turbo">
+</a> <a class="app-row c6" href="/wsjf-turbo">
     <div class="app-num">06</div>
     <div class="app-body">
       <div class="app-name">WSJF Turbo</div>
@@ -443,7 +454,7 @@
   </a>
 
   <!-- UPCOMING SLOT -->
-  <div class="app-row upcoming c6">
+  <div class="app-row upcoming c8">
     <div class="app-num">08</div>
     <div class="app-body">
       <div class="app-name blur-title">Out of office</div>

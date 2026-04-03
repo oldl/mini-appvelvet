@@ -159,8 +159,10 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; h
 .weather-geo { display:flex; align-items:center; justify-content:space-between; padding:0.52rem 0 0.65rem; margin-top:0.48rem; }
 .weather-geo--under-clock { padding:0.2rem 0 0.35rem; margin-top:0.15rem; }
 .weather-block { display:flex; align-items:center; gap:0.4rem; }
+.weather-stack { display:flex; flex-direction:column; gap:0.14rem; }
 .weather-icon { font-size:1rem; }
 .weather-text { font-family:'DM Mono', monospace; font-size:0.72rem; color:var(--warm-mid); }
+.weather-next-day { font-family:'DM Mono', monospace; font-size:0.48rem; color:rgba(239,244,255,0.56); letter-spacing:0.05em; text-transform:uppercase; }
 .geo-btn { font-size:0.44rem; color:var(--shade-blue); border:1px solid rgba(90,122,138,0.3); padding:0.17rem 0.44rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; background:none; font-family:'DM Mono',monospace; }
 .geo-btn:hover { border-color:var(--shade-blue); }
 .geo-btn.located { color:var(--sun-bright); border-color:rgba(245,166,35,0.4); }
@@ -386,7 +388,10 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; h
     <div class="weather-geo weather-geo--under-clock">
       <div class="weather-block">
         <span class="weather-icon" id="weatherIcon">—</span>
-        <span class="weather-text" id="contextText">Météo…</span>
+        <div class="weather-stack">
+          <span class="weather-text" id="contextText">Météo…</span>
+          <span class="weather-next-day" id="nextDayForecast">Demain…</span>
+        </div>
       </div>
       <button class="geo-btn" id="geoBtn" onclick="requestGeo()">📍 Me localiser</button>
     </div>
@@ -831,7 +836,7 @@ async function fetchWeather(lat,lng){
   const k=`${lat.toFixed(2)},${lng.toFixed(2)}`;
   if(weatherCache[k]) return weatherCache[k];
   try {
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=weather_code,temperature_2m,wind_speed_10m,wind_direction_10m,uv_index&hourly=weather_code&timezone=auto&forecast_days=1`;
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=weather_code,temperature_2m,wind_speed_10m,wind_direction_10m,uv_index&hourly=weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`;
     const d=await(await fetch(url)).json();
     const[icon,desc]=WMO[d.current.weather_code]||['🌡','Météo'];
     // Build hourly weather map: hour (0-23) → weather_code
@@ -840,11 +845,23 @@ async function fetchWeather(lat,lng){
       const h=new Date(t).getHours();
       hourlyMap[h]=d.hourly.weather_code[i];
     });
-    const dirs=['N','NE','E','SE','S','SO','O','NO'];const windDir=dirs[Math.round(d.current.wind_direction_10m/45)%8];const windSpeed=Math.round(d.current.wind_speed_10m);const uvIndex=Number.isFinite(d.current.uv_index)?Math.round(d.current.uv_index):null;const result={icon,desc,temp:Math.round(d.current.temperature_2m),windSpeed,windDir,uvIndex,hourlyMap};
+    let tomorrow=null;
+    if(d.daily && Array.isArray(d.daily.time) && d.daily.time.length > 1){
+      const nextCode=d.daily.weather_code?.[1];
+      const nextMax=d.daily.temperature_2m_max?.[1];
+      const nextMin=d.daily.temperature_2m_min?.[1];
+      const nextRain=d.daily.precipitation_probability_max?.[1];
+      const [nextIcon,nextDesc]=WMO[nextCode]||['🌡','Variable'];
+      const parts=[`${nextIcon} ${nextDesc}`];
+      if(Number.isFinite(nextMax) && Number.isFinite(nextMin)) parts.push(`${Math.round(nextMax)}°/${Math.round(nextMin)}°`);
+      if(Number.isFinite(nextRain)) parts.push(`${Math.round(nextRain)}% pluie`);
+      tomorrow={icon:nextIcon,desc:nextDesc,tempMax:Number.isFinite(nextMax)?Math.round(nextMax):null,tempMin:Number.isFinite(nextMin)?Math.round(nextMin):null,precipitation:Number.isFinite(nextRain)?Math.round(nextRain):null,label:`Demain · ${parts.join(' · ')}`};
+    }
+    const dirs=['N','NE','E','SE','S','SO','O','NO'];const windDir=dirs[Math.round(d.current.wind_direction_10m/45)%8];const windSpeed=Math.round(d.current.wind_speed_10m);const uvIndex=Number.isFinite(d.current.uv_index)?Math.round(d.current.uv_index):null;const result={icon,desc,temp:Math.round(d.current.temperature_2m),windSpeed,windDir,uvIndex,hourlyMap,tomorrow};
     weatherCache[k]=result;
     return result;
   } catch {
-    return{icon:'—',desc:'Météo indisponible',temp:null,hourlyMap:{}};
+    return{icon:'—',desc:'Météo indisponible',temp:null,hourlyMap:{},tomorrow:null};
   }
 }
 
@@ -871,6 +888,7 @@ async function loadCommune(key){
   const [jsonData,w] = await Promise.all([fetchFromJSON(key), fetchWeather(c.lat,c.lng)]);
   document.getElementById('weatherIcon').textContent=w.icon;
   document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°${w.windSpeed?` · ${w.windDir} ${w.windSpeed} km/h`:''}`:w.desc;
+  document.getElementById('nextDayForecast').textContent=w.tomorrow?.label || 'Demain · prévision indisponible';
   window._weatherMap=w.hourlyMap||{};
   const _uvEl=document.getElementById('uvInline');
   if(_uvEl&&w.uvIndex!=null){const _p=Math.min(100,w.uvIndex/11*100).toFixed(1);_uvEl.innerHTML='<span class="uv-chip">UV '+w.uvIndex+' <span class="uv-chip-bar"><span class="uv-chip-dot" style="left:'+_p+'%"></span></span></span>';}
@@ -970,7 +988,7 @@ if (document.fonts && document.fonts.ready) {
   window.addEventListener('load', () => requestAnimationFrame(initArc));
 }
 window.addEventListener('resize', () => { computeArcMapping(); drawArc(); updateArc(getActiveSlot()); });
-fetchWeather(COMMUNES['ixelles'].lat,COMMUNES['ixelles'].lng).then(w=>{document.getElementById('weatherIcon').textContent=w.icon;document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°`:w.desc;});
+fetchWeather(COMMUNES['ixelles'].lat,COMMUNES['ixelles'].lng).then(w=>{document.getElementById('weatherIcon').textContent=w.icon;document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°`:w.desc;document.getElementById('nextDayForecast').textContent=w.tomorrow?.label || 'Demain · prévision indisponible';});
 loadCommune('ixelles');
 </script>
 

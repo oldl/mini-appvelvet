@@ -215,6 +215,8 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; h
 .sun-window.theoretical { color: var(--warm-mid); opacity: 0.7; }
 .sun-window.theoretical strong { color: var(--warm-mid); }
 .sun-window-note { font-size: 0.46rem; opacity: 0.55; display: block; margin-top: 0.15rem; letter-spacing: 0.04em; }
+.beer-warm { font-size:0.58rem; color:rgba(239,244,255,0.78); margin-top:0.22rem; letter-spacing:0.03em; }
+.beer-warm strong { color:var(--sun-bright); }
 
 .street-type-tag { font-size:0.56rem; color:rgba(239,244,255,0.72); opacity:1; letter-spacing:0.04em; margin-top:0.08rem; }
 .slot-weather-row { display:flex; align-items:center; gap:0.55rem; margin-top:0.28rem; flex-wrap:wrap; }
@@ -880,6 +882,15 @@ function effectiveStatus(solarStatus, weatherCode){
   return solarStatus; // 's' or 'p', weather is fine
 }
 
+function estimateBeerWarmMinutes(status,tempC,isRooftop){
+  const base=status==='s'?18:status==='p'?32:(status==='r'||status==='c')?75:55;
+  const temp=Number.isFinite(tempC)?tempC:20;
+  let minutes=base-(temp-20);
+  if(isRooftop) minutes-=4;
+  minutes=Math.max(8,Math.min(90,Math.round(minutes)));
+  return minutes;
+}
+
 // ── LOAD ──
 async function loadCommune(key){
   if(cache[key]){renderList();return;}
@@ -889,6 +900,7 @@ async function loadCommune(key){
   document.getElementById('weatherIcon').textContent=w.icon;
   document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°${w.windSpeed?` · ${w.windDir} ${w.windSpeed} km/h`:''}`:w.desc;
   document.getElementById('nextDayForecast').textContent=w.tomorrow?.label || 'Demain · prévision indisponible';
+  window._weatherTemp=w.temp;
   window._weatherMap=w.hourlyMap||{};
   const _uvEl=document.getElementById('uvInline');
   if(_uvEl&&w.uvIndex!=null){const _p=Math.min(100,w.uvIndex/11*100).toFixed(1);_uvEl.innerHTML='<span class="uv-chip">UV '+w.uvIndex+' <span class="uv-chip-bar"><span class="uv-chip-dot" style="left:'+_p+'%"></span></span></span>';}
@@ -938,13 +950,15 @@ function renderList(){
   const labels={s:'Plein soleil',p:'Partiel',n:"À l'ombre",r:'🌧 Pluie',c:'☁ Couvert'};
   document.getElementById('mainContent').innerHTML='<div class="cafe-list">'+cafes.map((cafe,idx)=>{
     const win=getSunWindow(cafe.schedule,wMap),bar=cafe.schedule.map((s,i)=>`<div class="ds ${s}${i===slot?' active':''}"></div>`).join('');
+    const beerWarmMinutes=estimateBeerWarmMinutes(cafe.statusNow, window._weatherTemp, !!cafe.rooftop);
+    const beerWarmHtml=`<div class="beer-warm">Bière tiède dans <strong>~${beerWarmMinutes} min</strong></div>`;
     let expand;
     if(win && !win.theoretical){
-      expand=`<div class="sun-window">Soleil de <strong>${win.from}</strong> à <strong>${win.to}</strong></div>`;
+      expand=`<div class="sun-window">Soleil de <strong>${win.from}</strong> à <strong>${win.to}</strong></div>${beerWarmHtml}`;
     } else if(win && win.theoretical){
-      expand=`<div class="sun-window theoretical">☁ Théorique : <strong>${win.from}</strong> – <strong>${win.to}</strong><br><span class="sun-window-note">Soleil possible si le temps s'améliore</span></div>`;
+      expand=`<div class="sun-window theoretical">☁ Théorique : <strong>${win.from}</strong> – <strong>${win.to}</strong><br><span class="sun-window-note">Soleil possible si le temps s'améliore</span></div>${beerWarmHtml}`;
     } else {
-      expand=`<div class="sun-window" style="opacity:0.3">Pas d'ensoleillement direct</div>`;
+      expand=`<div class="sun-window" style="opacity:0.3">Pas d'ensoleillement direct</div>${beerWarmHtml}`;
     }
     const cardCls=["s","p"].includes(cafe.statusNow)?cafe.statusNow:"n";
     return`<div class="cafe-card ${cardCls}" onclick="toggleCard(${idx})"><div><div class="cafe-name-row"><div class="cafe-name">${cafe.name}</div>${cafe.rooftop?'<div class="rooftop-tag">🌇 rooftop</div>':''}${cafe.curated?'<div class="curated-dot"></div>':''}${cafe.address?`<div class="cafe-address">${cafe.address}</div><button class="copy-btn" onclick="copyAddress(event,'${cafe.name.replace(/'/g,"\\'")}${cafe.address?', '+cafe.address.replace(/'/g,"\\'"):''}')">⎘</button>`:''}</div><div class="cafe-meta-row">${cafe.dist!==undefined?`<div class="cafe-dist">${fmtDist(cafe.dist)}</div>`:''}</div></div><div class="sun-badge ${cafe.statusNow}">${labels[cafe.statusNow]}</div><div class="day-bar-mini">${bar}</div><div class="card-expanded" id="expand-${idx}"><div class="expand-ticks"><span>6h</span><span>10h</span><span>14h</span><span>18h</span><span>22h</span></div>${expand}<div class="azimuth-tag">Façade ${azDir(cafe.azimuth)} · ${cafe.azimuth}°</div>${cafe.street_type&&stLabel(cafe.street_type)?`<div class="street-type-tag">${stLabel(cafe.street_type)}</div>`:''}</div></div>`;
@@ -988,7 +1002,7 @@ if (document.fonts && document.fonts.ready) {
   window.addEventListener('load', () => requestAnimationFrame(initArc));
 }
 window.addEventListener('resize', () => { computeArcMapping(); drawArc(); updateArc(getActiveSlot()); });
-fetchWeather(COMMUNES['ixelles'].lat,COMMUNES['ixelles'].lng).then(w=>{document.getElementById('weatherIcon').textContent=w.icon;document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°`:w.desc;document.getElementById('nextDayForecast').textContent=w.tomorrow?.label || 'Demain · prévision indisponible';});
+fetchWeather(COMMUNES['ixelles'].lat,COMMUNES['ixelles'].lng).then(w=>{document.getElementById('weatherIcon').textContent=w.icon;document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°`:w.desc;document.getElementById('nextDayForecast').textContent=w.tomorrow?.label || 'Demain · prévision indisponible';window._weatherTemp=w.temp;});
 loadCommune('ixelles');
 </script>
 

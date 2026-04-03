@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /**
- * SunSpots â generate-data.js
- * GÃ©nÃ¨re sunspots-data.json depuis Airtable
+ * SunSpots - generate-data.js
+ * Genere sunspots-data.json depuis Airtable
  * Usage: node generate-data.js
- * DÃ©pose le JSON gÃ©nÃ©rÃ© dans le mÃªme dossier que index.html sur Netlify
+ * Depose le JSON genere dans le meme dossier que index.html sur Netlify
  */
 
 const TOKEN = process.env.AIRTABLE_TOKEN
 const BASE  = 'appLZBC3hd6wuUTVR';
 const TABLE = 'tbl3wivJNAop2e1z7';
 const fs    = require('fs');
+const path  = require('path');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function fetchAllAirtable() {
@@ -18,7 +19,7 @@ async function fetchAllAirtable() {
     filterByFormula: '{city}="bruxelles"',
     pageSize: '100',
   });
-['Name','address','lat','lng','azimuth','rooftop','street_type'].forEach(f => params.append('fields[]', f));
+['Name','address','lat','lng','azimuth','rooftop','street_type','slug','placeId','website','note','nombre_avis','openingHoursText','googleMapsUrl'].forEach(f => params.append('fields[]', f));
   let records = [], offset = null, page = 0;
   do {
     if (offset) params.set('offset', offset); else params.delete('offset');
@@ -30,11 +31,11 @@ async function fetchAllAirtable() {
     records = records.concat(d.records || []);
     offset = d.offset || null;
     page++;
-    process.stdout.write(`\r  page ${page} â ${records.length} records`);
+    process.stdout.write(`\r  page ${page} - ${records.length} records`);
     await sleep(250);
   } while (offset);
 
-  console.log(`\nâ ${records.length} records fetched`);
+  console.log(`\nOK ${records.length} records fetched`);
   return records;
 }
 
@@ -72,10 +73,17 @@ async function main() {
     lng:     Number(r.fields.lng),
     azimuth: Number.isFinite(Number(r.fields.azimuth)) ? Number(r.fields.azimuth) : null,
     rooftop: Boolean(r.fields.rooftop),
-street_type: r.fields.street_type || null,
+    street_type: r.fields.street_type || null,
+    slug: r.fields.slug || null,
+    placeId: r.fields.placeId || null,
+    website: r.fields.website || null,
+    note: Number.isFinite(Number(r.fields.note)) ? Number(r.fields.note) : null,
+    nombre_avis: Number.isFinite(Number(r.fields.nombre_avis)) ? Number(r.fields.nombre_avis) : null,
+    openingHoursText: r.fields.openingHoursText || null,
+    googleMapsUrl: r.fields.googleMapsUrl || null,
   })).filter(t => Number.isFinite(t.lat) && Number.isFinite(t.lng) && t.name);
   
-  console.log(`â ${all.length} valid records after normalization`);
+  console.log(`OK ${all.length} valid records after normalization`);
 
   // Partition by commune
   const byCommune = {};
@@ -91,11 +99,11 @@ street_type: r.fields.street_type || null,
     bruxelles: byCommune,
   };
 
-  const outPath = './sunspots/sunspots-data.json';
+  const outPath = path.join(__dirname, 'sunspots-data.json');
   fs.writeFileSync(outPath, JSON.stringify(output));
   const size = (fs.statSync(outPath).size / 1024).toFixed(1);
-  console.log(`\nâ ${outPath} generated â ${size}kb`);
-  console.log('   â DÃ©pose ce fichier avec index.html sur Netlify');
+  console.log(`\nOK ${outPath} generated - ${size}kb`);
+  console.log('   -> Depose ce fichier avec index.html sur Netlify');
 }
 
 main().catch(e => { console.error('Error:', e.message); process.exit(1); });

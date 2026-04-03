@@ -192,7 +192,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; h
 
 .cafe-name { font-family:'Syne', sans-serif; font-weight:700; font-size:0.95rem; color:var(--cream); line-height:1.2; }
 .cafe-meta-row { display:flex; align-items:center; gap:0.38rem; margin-top:0.05rem; flex-wrap:wrap; }
-.cafe-dist { font-size:0.46rem; color:var(--warm-mid); opacity:0.38; }
+.cafe-dist { font-size:0.52rem; color:var(--warm-mid); opacity:0.5; }
 .cafe-dist::before { content:'·'; margin-right:0.3rem; }
 
 .sun-badge { font-family:'Barlow Condensed', sans-serif; font-weight:800; font-size:0.65rem; letter-spacing:0.08em; padding:0.12rem 0.42rem; align-self:start; flex-shrink:0; white-space:nowrap; }
@@ -225,9 +225,9 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; h
 .azimuth-tag { font-size:0.44rem; color:rgba(154,122,90,0.22); margin-top:0.17rem; letter-spacing:0.05em; }
 
 .cafe-name-row { display:flex; align-items:baseline; gap:0.5rem; flex-wrap:wrap; }
-.cafe-address { font-size:0.52rem; color:var(--warm-mid); opacity:0.5; font-family:'DM Mono',monospace; }
-.copy-btn { background:none; border:none; cursor:pointer; padding:0 0.1rem; font-size:0.65rem; opacity:0.3; transition:opacity 0.2s; line-height:1; flex-shrink:0; color:var(--warm-mid); }
-.copy-btn:hover { opacity:0.8; }
+.cafe-address { font-size:0.6rem; color:rgba(239,244,255,0.62); opacity:1; font-family:'DM Mono',monospace; line-height:1.35; }
+.copy-btn { display:inline-flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.04); border:1px solid rgba(122,150,184,0.22); border-radius:999px; cursor:pointer; padding:0.16rem 0.34rem; min-width:1.45rem; min-height:1.45rem; font-size:0.82rem; opacity:0.78; transition:opacity 0.2s, border-color 0.2s, background 0.2s, transform 0.2s; line-height:1; flex-shrink:0; color:var(--cream); }
+.copy-btn:hover { opacity:1; border-color:rgba(245,166,35,0.4); background:rgba(245,166,35,0.08); transform:translateY(-1px); }
 .copy-btn.copied { opacity:1; color:var(--sun-bright); }
 .copy-toast { position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%); background:var(--bg-mid); border:1px solid rgba(245,166,35,0.28); color:var(--sun-bright); font-size:0.52rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.35rem 0.88rem; pointer-events:none; opacity:0; transition:opacity 0.2s; z-index:300; }
 .copy-toast.show { opacity:1; }

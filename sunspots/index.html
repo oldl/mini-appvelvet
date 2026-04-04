@@ -226,11 +226,11 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; h
 
 .cafe-name-row { display:flex; align-items:baseline; gap:0.5rem; flex-wrap:wrap; }
 .cafe-address { font-size:0.6rem; color:rgba(239,244,255,0.62); opacity:1; font-family:'DM Mono',monospace; line-height:1.35; }
-.place-inline-meta { display:flex; align-items:center; gap:0.32rem; flex-wrap:wrap; margin-top:0.22rem; }
-.place-chip { font-size:0.52rem; color:rgba(239,244,255,0.68); border:1px solid rgba(255,255,255,0.14); padding:0.08rem 0.3rem; border-radius:999px; line-height:1.2; }
-.place-chip.rating { color:rgba(255,209,102,0.92); border-color:rgba(255,209,102,0.28); }
-.place-chip.link { color:rgba(122,173,204,0.92); border-color:rgba(122,173,204,0.24); text-decoration:none; }
-.place-chip.link:hover { background:rgba(122,173,204,0.08); }
+.place-inline-meta { display:flex; align-items:center; gap:0.42rem; flex-wrap:wrap; margin-top:0.28rem; position:relative; z-index:1; }
+.place-chip { font-size:0.6rem; color:rgba(239,244,255,0.82); border:1px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.04); padding:0.14rem 0.42rem; border-radius:999px; line-height:1.2; }
+.place-chip.rating { color:#ffd166; border-color:rgba(255,209,102,0.38); background:rgba(255,209,102,0.08); font-weight:600; }
+.place-chip.link { color:#8ecae6; border-color:rgba(142,202,230,0.34); text-decoration:none; background:rgba(122,173,204,0.08); }
+.place-chip.link:hover { background:rgba(122,173,204,0.16); }
 .copy-btn { display:inline-flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.04); border:1px solid rgba(122,150,184,0.22); border-radius:999px; cursor:pointer; padding:0.16rem 0.34rem; min-width:1.45rem; min-height:1.45rem; font-size:0.82rem; opacity:0.78; transition:opacity 0.2s, border-color 0.2s, background 0.2s, transform 0.2s; line-height:1; flex-shrink:0; color:var(--cream); }
 .copy-btn:hover { opacity:1; border-color:rgba(245,166,35,0.4); background:rgba(245,166,35,0.08); transform:translateY(-1px); }
 .copy-btn.copied { opacity:1; color:var(--sun-bright); }
@@ -888,11 +888,12 @@ function effectiveStatus(solarStatus, weatherCode){
 
 function estimateBeerWarmMinutes(status,tempC,isRooftop){
   const base=status==='s'?18:status==='p'?32:(status==='r'||status==='c')?75:55;
-  const temp=Number.isFinite(tempC)?tempC:20;
+  const parsedTemp = Number(tempC);
+  const temp=Number.isFinite(parsedTemp)?parsedTemp:20;
   let minutes=base-(temp-20);
   if(isRooftop) minutes-=4;
-  minutes=Math.max(8,Math.min(90,Math.round(minutes)));
-  return minutes;
+  const safeMinutes=Math.max(8,Math.min(90,Math.round(minutes)));
+  return Number.isFinite(safeMinutes) ? safeMinutes : 45;
 }
 
 // ── LOAD ──
@@ -962,7 +963,7 @@ function renderList(){
   else countHtml=`Aucune terrasse au soleil ${ref}`;
   document.getElementById('sunCount').innerHTML=countHtml;
   const beerWarmEl=document.getElementById('beerWarmInline');
-  if(beerWarmEl) beerWarmEl.textContent=`Temps actuelle de réchauffement d'une Bière : ~${beerWarmMinutes} min`;
+  if(beerWarmEl) beerWarmEl.textContent=`Temps actuel de rechauffement d'une biere : ~${beerWarmMinutes} min`;
   const labels={s:'Plein soleil',p:'Partiel',n:"À l'ombre",r:'🌧 Pluie',c:'☁ Couvert'};
   document.getElementById('mainContent').innerHTML='<div class="cafe-list">'+cafes.map((cafe,idx)=>{
     const win=getSunWindow(cafe.schedule,wMap),bar=cafe.schedule.map((s,i)=>`<div class="ds ${s}${i===slot?' active':''}"></div>`).join('');
@@ -975,8 +976,11 @@ function renderList(){
       expand=`<div class="sun-window" style="opacity:0.3">Pas d'ensoleillement direct</div>`;
     }
     const cardCls=["s","p"].includes(cafe.statusNow)?cafe.statusNow:"n";
+    const ratingLabel = cafe.note!=null
+      ? `★ ${escapeHtml(cafe.note)}${cafe.nombre_avis!=null ? ` · ${escapeHtml(cafe.nombre_avis)} avis` : ''}`
+      : '';
     const placeMeta = [
-      (cafe.note!=null && cafe.nombre_avis!=null) ? `<span class="place-chip rating">★ ${escapeHtml(cafe.note)} · ${escapeHtml(cafe.nombre_avis)} avis</span>` : '',
+      ratingLabel ? `<span class="place-chip rating">${ratingLabel}</span>` : '',
       cafe.googleMapsUrl ? `<a class="place-chip link" href="${escapeHtml(cafe.googleMapsUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Maps</a>` : '',
       cafe.website ? `<a class="place-chip link" href="${escapeHtml(cafe.website)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Site</a>` : ''
     ].filter(Boolean).join('');

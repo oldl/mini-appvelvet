@@ -687,6 +687,13 @@ else if (payload.records) { raw = payload.records; }
       azimuth: Number.isFinite(Number(r.azimuth)) ? Number(r.azimuth) : null,
       rooftop: !!r.rooftop,
       street_type: r.street_type || null,
+      slug: r.slug || null,
+      placeId: r.placeId || null,
+      website: r.website || null,
+      note: Number.isFinite(Number(r.note)) ? Number(r.note) : null,
+      nombre_avis: Number.isFinite(Number(r.nombre_avis)) ? Number(r.nombre_avis) : null,
+      openingHoursText: r.openingHoursText || null,
+      googleMapsUrl: r.googleMapsUrl || null,
       curated: true,
     })).filter(t => Number.isFinite(t.lat) && Number.isFinite(t.lng) && t.name);
 

@@ -19,8 +19,22 @@ async function fetchAllAirtable() {
     filterByFormula: '{city}="bruxelles"',
     pageSize: '100',
   });
-['Name','address','lat','lng','azimuth','rooftop','street_type','slug','placeId','website','note','nombre_avis','openingHoursText','googleMapsUrl'].forEach(f => params.append('fields[]', f));
-  let records = [], offset = null, page = 0;
+[
+  'Name',
+  'address',
+  'lat',
+  'lng',
+  'azimuth',
+  'rooftop',
+  'street_type',
+  'website',
+  'openingHoursText',
+  'note',
+  'nombre_avis',
+  'googleMapsUrl'
+].forEach(f => params.append('fields[]', f));
+
+let records = [], offset = null, page = 0;
   do {
     if (offset) params.set('offset', offset); else params.delete('offset');
     const res = await fetch(`https://api.airtable.com/v0/${BASE}/${TABLE}?${params}`, {

@@ -215,6 +215,14 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; h
 .sun-window.theoretical { color: var(--warm-mid); opacity: 0.7; }
 .sun-window.theoretical strong { color: var(--warm-mid); }
 .sun-window-note { font-size: 0.46rem; opacity: 0.55; display: block; margin-top: 0.15rem; letter-spacing: 0.04em; }
+.sunspot-meta-row { display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap; margin-top:0.32rem; }
+.sunspot-index-badge { display:inline-flex; align-items:baseline; gap:0.25rem; padding:0.18rem 0.46rem; border-radius:999px; border:1px solid rgba(245,166,35,0.3); background:rgba(245,166,35,0.08); color:var(--cream); }
+.sunspot-index-badge strong { font-family:'Barlow Condensed',sans-serif; font-size:0.86rem; letter-spacing:0.05em; color:var(--sun-bright); line-height:1; }
+.sunspot-index-badge span { font-size:0.48rem; letter-spacing:0.08em; text-transform:uppercase; color:rgba(239,244,255,0.72); }
+.sunspot-label { font-size:0.58rem; letter-spacing:0.04em; color:rgba(239,244,255,0.88); }
+.sunspot-explainer { font-size:0.52rem; color:rgba(239,244,255,0.6); margin-top:0.2rem; letter-spacing:0.03em; }
+.sunspot-debug { display:flex; align-items:center; gap:0.42rem; flex-wrap:wrap; margin-top:0.35rem; }
+.sunspot-debug-chip { font-size:0.48rem; color:rgba(239,244,255,0.66); border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); padding:0.1rem 0.3rem; border-radius:999px; letter-spacing:0.04em; }
 .street-type-tag { font-size:0.56rem; color:rgba(239,244,255,0.72); opacity:1; letter-spacing:0.04em; margin-top:0.08rem; }
 .slot-weather-row { display:flex; align-items:center; gap:0.55rem; margin-top:0.28rem; flex-wrap:wrap; }
 .slot-weather-row span { font-size:0.5rem; font-family:'DM Mono',monospace; color:var(--cream); letter-spacing:0.03em; white-space:nowrap; }
@@ -870,7 +878,7 @@ async function fetchWeather(lat,lng){
       if(Number.isFinite(nextRain)) parts.push(`${Math.round(nextRain)}% pluie`);
       tomorrow={icon:nextIcon,desc:nextDesc,tempMax:Number.isFinite(nextMax)?Math.round(nextMax):null,tempMin:Number.isFinite(nextMin)?Math.round(nextMin):null,precipitation:Number.isFinite(nextRain)?Math.round(nextRain):null,label:`Demain · ${parts.join(' · ')}`};
     }
-    const dirs=['N','NE','E','SE','S','SO','O','NO'];const windDir=dirs[Math.round(d.current.wind_direction_10m/45)%8];const windSpeed=Math.round(d.current.wind_speed_10m);const uvIndex=Number.isFinite(d.current.uv_index)?Math.round(d.current.uv_index):null;const result={icon,desc,temp:Math.round(d.current.temperature_2m),windSpeed,windDir,uvIndex,hourlyMap,tomorrow};
+    const dirs=['N','NE','E','SE','S','SO','O','NO'];const windDir=dirs[Math.round(d.current.wind_direction_10m/45)%8];const windSpeed=Math.round(d.current.wind_speed_10m);const uvIndex=Number.isFinite(d.current.uv_index)?Math.round(d.current.uv_index):null;const result={icon,desc,temp:Math.round(d.current.temperature_2m),windSpeed,windDir,uvIndex,weatherCode:d.current.weather_code,hourlyMap,tomorrow};
     weatherCache[k]=result;
     return result;
   } catch {
@@ -903,6 +911,113 @@ function estimateBeerWarmMinutes(status,tempC,isRooftop){
   return Number.isFinite(safeMinutes) ? safeMinutes : 45;
 }
 
+function clamp(num,min,max){return Math.max(min,Math.min(max,num));}
+
+function getRemainingSunnyMinutes(schedule, slot, hourlyMap){
+  let slots = 0;
+  for(let i=slot;i<schedule.length;i++){
+    const eff=effectiveStatus(schedule[i], weatherForSlot(hourlyMap, i));
+    if(eff!=='s') break;
+    slots++;
+  }
+  return slots * 15;
+}
+
+function getSunspotLabel(score){
+  if(score>=90) return 'Spot parfait';
+  if(score>=75) return 'Très bon spot';
+  if(score>=60) return 'Bon spot';
+  if(score>=40) return 'Correct';
+  return 'Pas le moment';
+}
+
+function getSunspotExplanation(statusNow, weather, remainingSunnyMinutes){
+  const wind = Number.isFinite(weather?.windSpeed) ? weather.windSpeed : null;
+  if(statusNow==='s'){
+    const windText = wind!=null && wind <= 18 ? 'peu de vent' : wind!=null ? `vent ${wind} km/h` : 'météo stable';
+    if(remainingSunnyMinutes >= 45) return `Soleil franc, ${windText}, encore ${remainingSunnyMinutes} min de soleil`;
+    if(remainingSunnyMinutes > 0) return `Soleil franc, mais il ne reste qu'environ ${remainingSunnyMinutes} min`;
+    return `Soleil franc, mais la fenêtre est très courte`;
+  }
+  if(statusNow==='p'){
+    if(remainingSunnyMinutes > 0) return `Bon spot, soleil partiel encore ${remainingSunnyMinutes} min`;
+    return `Bon spot, mais le soleil tourne déjà`;
+  }
+  if(statusNow==='r') return `Pluie maintenant, exposition seulement théorique`;
+  if(statusNow==='c') return `Bon axe solaire, mais le ciel coupe le soleil`;
+  return `Bon cadre, mais pas de soleil direct maintenant`;
+}
+
+function computeSunspotIndex(spot, weather, sunContext){
+  const statusNow = sunContext.statusNow;
+  const remainingSunnyMinutes = sunContext.remainingSunnyMinutes ?? 0;
+  const weatherCode = sunContext.weatherCode;
+
+  const sunNowScore =
+    statusNow==='s' ? 50 :
+    statusNow==='p' ? 34 :
+    statusNow==='c' ? 10 :
+    statusNow==='r' ? 6 : 0;
+
+  let remainingScore = clamp(Math.round((remainingSunnyMinutes / 120) * 20), 0, 20);
+  if(statusNow==='p') remainingScore = Math.min(remainingScore, 12);
+  if(!['s','p'].includes(statusNow)) remainingScore = 0;
+
+  const temp = Number.isFinite(Number(weather?.temp)) ? Number(weather.temp) : 20;
+  const wind = Number.isFinite(Number(weather?.windSpeed)) ? Number(weather.windSpeed) : 12;
+  const tempScore = clamp(Math.round(10 - Math.abs(temp - 22)), 0, 10);
+  const windScore = clamp(Math.round(10 - Math.max(0, wind - 8) / 2), 0, 10);
+  let comfortScore = tempScore + windScore;
+  if(isRainy(weatherCode)) comfortScore = Math.min(comfortScore, 2);
+  else if(isOvercast(weatherCode)) comfortScore = Math.min(comfortScore, 8);
+  comfortScore = clamp(comfortScore, 0, 20);
+
+  let placeScore = 0;
+  if(spot.rooftop) placeScore += 2;
+  const streetBonus = {
+    pieton: 3,
+    zone_rencontre: 2,
+    rue: 1,
+    avenue: -1,
+    boulevard: -2,
+    grand_boulevard: -3,
+  };
+  placeScore += streetBonus[spot.street_type] || 0;
+  placeScore = clamp(placeScore, 0, 5);
+
+  let qualityScore = 0;
+  if(Number.isFinite(Number(spot.note))){
+    qualityScore += clamp(Math.round((Number(spot.note) - 3.5) * 2), 0, 3);
+  }
+  if(Number.isFinite(Number(spot.nombre_avis))){
+    qualityScore += Number(spot.nombre_avis) >= 400 ? 1 : Number(spot.nombre_avis) >= 80 ? 0.5 : 0;
+  }
+  if(Number.isFinite(Number(spot.azimuth))) qualityScore += 1;
+  qualityScore = clamp(Math.round(qualityScore), 0, 5);
+
+  let score = sunNowScore + remainingScore + comfortScore + placeScore + qualityScore;
+  if(statusNow==='n') score = Math.min(score, 39);
+  if(['r','c'].includes(statusNow)) score = Math.min(score, 35);
+  score = clamp(Math.round(score), 0, 100);
+
+  const breakdown = {
+    sunNow: sunNowScore,
+    remainingSun: remainingScore,
+    comfort: comfortScore,
+    place: placeScore,
+    quality: qualityScore,
+    remainingSunnyMinutes,
+    weatherCode,
+  };
+
+  return {
+    sunspotIndex: score,
+    sunspotLabel: getSunspotLabel(score),
+    sunspotBreakdown: breakdown,
+    sunspotExplanation: getSunspotExplanation(statusNow, weather, remainingSunnyMinutes),
+  };
+}
+
 // ── LOAD ──
 async function loadCommune(key){
   if(cache[key]){renderList();return;}
@@ -913,6 +1028,7 @@ async function loadCommune(key){
   document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°${w.windSpeed?` · ${w.windDir} ${w.windSpeed} km/h`:''}`:w.desc;
   document.getElementById('nextDayForecast').textContent=w.tomorrow?.label || 'Demain · prévision indisponible';
   window._weatherTemp=w.temp;
+  window._weatherWindSpeed=w.windSpeed;
   window._weatherMap=w.hourlyMap||{};
   const _uvEl=document.getElementById('uvInline');
   if(_uvEl&&w.uvIndex!=null){const _p=Math.min(100,w.uvIndex/11*100).toFixed(1);_uvEl.innerHTML='<span class="uv-chip">UV '+w.uvIndex+' <span class="uv-chip-bar"><span class="uv-chip-dot" style="left:'+_p+'%"></span></span></span>';}
@@ -940,14 +1056,27 @@ function escapeHtml(str){
 }
 function renderList(){
   const slot=getActiveSlot(),data=cache[activeCommune];if(!data)return;
-  const order={s:0,p:1,n:2};
   const wMap=window._weatherMap||{};
   const wCode=weatherForSlot(wMap,slot);
   const cafes=[...data].map(c=>{
     const solar=c.schedule[Math.min(slot,95)];
     const eff=effectiveStatus(solar,wCode);
-    return{...c,statusNow:eff,solarStatus:solar};
+    const remainingSunnyMinutes=getRemainingSunnyMinutes(c.schedule, slot, wMap);
+    const sunspot=computeSunspotIndex(c, {
+      temp: window._weatherTemp,
+      windSpeed: window._weatherWindSpeed,
+      weatherCode: wCode,
+    }, {
+      slot,
+      statusNow: eff,
+      solarStatus: solar,
+      weatherCode: wCode,
+      remainingSunnyMinutes,
+    });
+    return{...c,statusNow:eff,solarStatus:solar,remainingSunnyMinutes,...sunspot};
   }).sort((a,b)=>{
+    const scoreDelta=(b.sunspotIndex??0)-(a.sunspotIndex??0);
+    if(scoreDelta!==0) return scoreDelta;
     const order2={s:0,p:1,r:2,c:3,n:4};
     const so=(order2[a.statusNow]??4)-(order2[b.statusNow]??4);
     return so!==0?so:(a.dist??9999)-(b.dist??9999);
@@ -983,6 +1112,9 @@ function renderList(){
       expand=`<div class="sun-window" style="opacity:0.3">Pas d'ensoleillement direct</div>`;
     }
     const cardCls=["s","p"].includes(cafe.statusNow)?cafe.statusNow:"n";
+    const sunspotDebug = cafe.sunspotBreakdown
+      ? `<div class="sunspot-debug"><span class="sunspot-debug-chip">Soleil ${cafe.sunspotBreakdown.sunNow}/50</span><span class="sunspot-debug-chip">Durée ${cafe.sunspotBreakdown.remainingSun}/20</span><span class="sunspot-debug-chip">Confort ${cafe.sunspotBreakdown.comfort}/20</span><span class="sunspot-debug-chip">Lieu ${cafe.sunspotBreakdown.place}/5</span><span class="sunspot-debug-chip">Confiance ${cafe.sunspotBreakdown.quality}/5</span></div>`
+      : '';
     const ratingLabel = cafe.note!=null
       ? `★ ${escapeHtml(cafe.note)}${cafe.nombre_avis!=null ? ` · ${escapeHtml(cafe.nombre_avis)} avis` : ''}`
       : '';
@@ -991,7 +1123,7 @@ function renderList(){
       cafe.googleMapsUrl ? `<a class="place-chip link" href="${escapeHtml(cafe.googleMapsUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Maps</a>` : '',
       cafe.website ? `<a class="place-chip link" href="${escapeHtml(cafe.website)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Site</a>` : ''
     ].filter(Boolean).join('');
-    return`<div class="cafe-card ${cardCls}" onclick="toggleCard(${idx})"><div><div class="cafe-name-row"><div class="cafe-name">${cafe.name}</div>${cafe.rooftop?'<div class="rooftop-tag">🌇 rooftop</div>':''}${cafe.curated?'<div class="curated-dot"></div>':''}${cafe.address?`<div class="cafe-address">${cafe.address}</div><button class="copy-btn" onclick="copyAddress(event,'${cafe.name.replace(/'/g,"\\'")}${cafe.address?', '+cafe.address.replace(/'/g,"\\'"):''}')">⎘</button>`:''}</div>${placeMeta?`<div class="place-inline-meta">${placeMeta}</div>`:''}<div class="cafe-meta-row">${cafe.dist!==undefined?`<div class="cafe-dist">${fmtDist(cafe.dist)}</div>`:''}</div></div><div class="sun-badge ${cafe.statusNow}">${labels[cafe.statusNow]}</div><div class="day-bar-mini">${bar}</div><div class="card-expanded" id="expand-${idx}"><div class="expand-ticks"><span>6h</span><span>10h</span><span>14h</span><span>18h</span><span>22h</span></div>${expand}<div class="azimuth-tag">Façade ${azDir(cafe.azimuth)} · ${cafe.azimuth}°</div>${cafe.street_type&&stLabel(cafe.street_type)?`<div class="street-type-tag">${stLabel(cafe.street_type)}</div>`:''}</div></div>`;
+    return`<div class="cafe-card ${cardCls}" onclick="toggleCard(${idx})"><div><div class="cafe-name-row"><div class="cafe-name">${cafe.name}</div>${cafe.rooftop?'<div class="rooftop-tag">🌇 rooftop</div>':''}${cafe.curated?'<div class="curated-dot"></div>':''}${cafe.address?`<div class="cafe-address">${cafe.address}</div><button class="copy-btn" onclick="copyAddress(event,'${cafe.name.replace(/'/g,"\\'")}${cafe.address?', '+cafe.address.replace(/'/g,"\\'"):''}')">⎘</button>`:''}</div>${placeMeta?`<div class="place-inline-meta">${placeMeta}</div>`:''}<div class="sunspot-meta-row"><div class="sunspot-index-badge"><span>Indice SunSpot</span><strong>${cafe.sunspotIndex}</strong></div><div class="sunspot-label">${cafe.sunspotLabel}</div></div><div class="sunspot-explainer">${cafe.sunspotExplanation}</div><div class="cafe-meta-row">${cafe.dist!==undefined?`<div class="cafe-dist">${fmtDist(cafe.dist)}</div>`:''}</div></div><div class="sun-badge ${cafe.statusNow}">${labels[cafe.statusNow]}</div><div class="day-bar-mini">${bar}</div><div class="card-expanded" id="expand-${idx}"><div class="expand-ticks"><span>6h</span><span>10h</span><span>14h</span><span>18h</span><span>22h</span></div>${expand}${sunspotDebug}<div class="azimuth-tag">Façade ${azDir(cafe.azimuth)} · ${cafe.azimuth}°</div>${cafe.street_type&&stLabel(cafe.street_type)?`<div class="street-type-tag">${stLabel(cafe.street_type)}</div>`:''}</div></div>`;
   }).join('')+'</div>';
 }
 function toggleCard(idx){document.getElementById(`expand-${idx}`).classList.toggle('open');}
@@ -1032,7 +1164,7 @@ if (document.fonts && document.fonts.ready) {
   window.addEventListener('load', () => requestAnimationFrame(initArc));
 }
 window.addEventListener('resize', () => { computeArcMapping(); drawArc(); updateArc(getActiveSlot()); });
-fetchWeather(COMMUNES['ixelles'].lat,COMMUNES['ixelles'].lng).then(w=>{document.getElementById('weatherIcon').textContent=w.icon;document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°`:w.desc;document.getElementById('nextDayForecast').textContent=w.tomorrow?.label || 'Demain · prévision indisponible';window._weatherTemp=w.temp;});
+fetchWeather(COMMUNES['ixelles'].lat,COMMUNES['ixelles'].lng).then(w=>{document.getElementById('weatherIcon').textContent=w.icon;document.getElementById('contextText').textContent=w.temp!==null?`${w.desc} · ${w.temp}°`:w.desc;document.getElementById('nextDayForecast').textContent=w.tomorrow?.label || 'Demain · prévision indisponible';window._weatherTemp=w.temp;window._weatherWindSpeed=w.windSpeed;});
 loadCommune('ixelles');
 </script>
 
